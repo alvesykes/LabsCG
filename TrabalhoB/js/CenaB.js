@@ -1,54 +1,11 @@
 import * as THREE from "three";
 
 let camera, scene, renderer;
-
-let ball, table;
-
-function addTableLeg(obj, x, y, z, material) {
-  const geometry = new THREE.BoxGeometry(2, 6, 2);
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(x, y - 3, z);
-  obj.add(mesh);
-}
-
-function addTableTop(obj, x, y, z, material) {
-  const geometry = new THREE.BoxGeometry(60, 2, 20);
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(x, y, z);
-  obj.add(mesh);
-}
-
-function createBall(x, y, z) {
-  const material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
-  const geometry = new THREE.SphereGeometry(4, 10, 10);
-  ball = new THREE.Mesh(geometry, material);
-
-  ball.userData = { jumping: true, step: 0 };
-  ball.position.set(x, y, z);
-
-  scene.add(ball);
-}
-
-function createTable(x, y, z) {
-  table = new THREE.Object3D();
-
-  const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
-
-  addTableTop(table, 0, 0, 0, material);
-  addTableLeg(table, -25, -1, -8, material);
-  addTableLeg(table, -25, -1, 8, material);
-  addTableLeg(table, 25, -1, 8, material);
-  addTableLeg(table, 25, -1, -8, material);
-
-  scene.add(table);
-
-  table.position.x = x;
-  table.position.y = y;
-  table.position.z = z;
-}
+let cameras = {};
 
 function createScene() {
   scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xf0f0f0); 
 
   scene.add(new THREE.AxesHelper(10));
 
@@ -56,65 +13,107 @@ function createScene() {
   createBall(0, 0, 15);
 }
 
-function createCamera() {
-  camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
-  camera.position.x = 50;
-  camera.position.y = 50;
-  camera.position.z = 50;
-  camera.lookAt(scene.position);
-}
+function createCameras() {
+  const aspect = window.innerWidth / window.innerHeight;
+  const frustumSize = 60;
 
-function onResize() {
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  // Frontal (olha de +Z para o centro)
+  cameras.frontal = new THREE.OrthographicCamera(
+    -frustumSize * aspect / 2, frustumSize * aspect / 2,
+    frustumSize / 2, -frustumSize / 2,
+    1, 1000
+  );
+  cameras.frontal.position.set(0, 0, 50);
+  cameras.frontal.lookAt(0, 0, 0);
 
-  if (window.innerHeight > 0 && window.innerWidth > 0) {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-  }
-}
+  // Lateral (olha de +X para o centro)
+  cameras.lateral = new THREE.OrthographicCamera(
+    -frustumSize * aspect / 2, frustumSize * aspect / 2,
+    frustumSize / 2, -frustumSize / 2,
+    1, 1000
+  );
+  cameras.lateral.position.set(50, 0, 0);
+  cameras.lateral.lookAt(0, 0, 0);
 
-function onKeyDown(e) {
-  switch (e.keyCode) {
-    case 65: //A
-    case 97: //a
-      ball.material.wireframe = !ball.material.wireframe;
-      table.children.forEach((element) => {
-        element.material.wireframe = !element.material.wireframe;
-      });
-      break;
-    case 83: //S
-    case 115: //s
-      ball.userData.jumping = !ball.userData.jumping;
-      break;
-  }
+  // Topo (olha de +Y para o centro)
+  cameras.topo = new THREE.OrthographicCamera(
+    -frustumSize * aspect / 2, frustumSize * aspect / 2,
+    frustumSize / 2, -frustumSize / 2,
+    1, 1000
+  );
+  cameras.topo.position.set(0, 50, 0);
+  cameras.topo.lookAt(0, 0, 0);
+
+  // Perspetiva (posição sobre a cena)
+  cameras.perspetiva = new THREE.PerspectiveCamera(70, aspect, 1, 1000);
+  cameras.perspetiva.position.set(50, 50, 50);
+  cameras.perspetiva.lookAt(0, 0, 0);
+
+  // Inicialmente ativa a perspetiva
+  camera = cameras.perspetiva;
 }
 
 function render() {
   renderer.render(scene, camera);
 }
 
-function init() {
-  renderer = new THREE.WebGLRenderer({
-    antialias: true,
+function onKeyDown(event) {
+  switch (event.key) {
+    case '1':
+      camera = cameras.frontal;
+      break;
+    case '2':
+      camera = cameras.lateral;
+      break;
+    case '3':
+      camera = cameras.topo;
+      break;
+    case '4':
+      camera = cameras.perspetiva;
+      break;
+    default:
+      break;
+  }
+}
+
+function onWindowResize() {
+  const aspect = window.innerWidth / window.innerHeight;
+  const frustumSize = 60;
+
+  // Atualiza o tamanho da câmera 
+  ['frontal', 'lateral', 'topo'].forEach(key => {
+    if (cameras[key]) {
+      cameras[key].left = -frustumSize * aspect / 2;
+      cameras[key].right = frustumSize * aspect / 2;
+      cameras[key].top = frustumSize / 2;
+      cameras[key].bottom = -frustumSize / 2;
+      cameras[key].updateProjectionMatrix();
+    }
   });
+
+  // Atualiza perspetiva
+  if (cameras.perspetiva) {
+    cameras.perspetiva.aspect = aspect;
+    cameras.perspetiva.updateProjectionMatrix();
+  }
+
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function init() {
+  renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
   createScene();
-  createCamera();
+  createCameras();
 
-  window.addEventListener("keydown", onKeyDown);
-  window.addEventListener("resize", onResize);
+  window.addEventListener('keydown', onKeyDown);
+  window.addEventListener('resize', onWindowResize);
 }
 
 function animate() {
-  if (ball.userData.jumping) {
-    ball.userData.step += 0.04;
-    ball.position.y = Math.abs(30 * Math.sin(ball.userData.step));
-    ball.position.z = 15 * Math.cos(ball.userData.step);
-  }
   render();
-
   requestAnimationFrame(animate);
 }
 
