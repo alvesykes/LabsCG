@@ -19,6 +19,15 @@ function createScene() {
 
   scene.add(new THREE.AxesHelper(10));
 
+  // Add lighting so MeshStandardMaterial shows colors
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+  scene.add(ambientLight);
+
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  directionalLight.position.set(30, 50, 50);
+  scene.add(directionalLight);
+
+  createRobot();
 }
 
 //////////////////////
@@ -26,7 +35,7 @@ function createScene() {
 //////////////////////
 function createCameras() {
   const aspect = window.innerWidth / window.innerHeight;
-  const frustumSize = 60;
+  const frustumSize = 80;
 
   // Frontal (olha de +Z para o centro)
   cameras.frontal = new THREE.OrthographicCamera(
@@ -37,7 +46,7 @@ function createCameras() {
     1,
     1000
   );
-  cameras.frontal.position.set(0, 0, 50);
+  cameras.frontal.position.set(0, 0, 50); 
   cameras.frontal.lookAt(0, 0, 0);
 
   // Lateral (olha de +X para o centro)
@@ -81,6 +90,175 @@ function createCameras() {
 /* CREATE OBJECT3D(S) */
 ////////////////////////
 
+function createRobot() {
+  const robot = new THREE.Group();
+
+  // Tronco
+  const tronco = new THREE.Mesh(
+    new THREE.BoxGeometry(20, 10, 12),
+    new THREE.MeshStandardMaterial({ color: 0xff0000 })
+  );
+  tronco.position.set(0, 0, 0);
+  robot.add(tronco);
+
+  // Cabeça
+  const cabeca = new THREE.Group();
+  const cabecaPrincipal = new THREE.Mesh(
+    new THREE.CylinderGeometry(2.5, 2.5, 5, 6),
+    new THREE.MeshStandardMaterial({ color: 0x0000ff })
+  );
+  cabecaPrincipal.position.set(0, 2.5, 0);
+  cabeca.add(cabecaPrincipal);
+
+  // Olhos 
+  const olhoL = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.5, 0.5, 1, 6),
+    new THREE.MeshStandardMaterial({ color: 0x000000 })
+  );
+  olhoL.rotation.x = Math.PI / 2;
+  olhoL.position.set(-1.2, 4.2, 1.8);
+  cabeca.add(olhoL);
+
+  const olhoR = olhoL.clone();
+  olhoR.position.x = 1.2;
+  cabeca.add(olhoR);
+
+  // Antenas
+  const antenaL = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.5, 0.5, 2.5, 6),
+    new THREE.MeshStandardMaterial({ color: 0xff0000 })
+  );
+  antenaL.position.set(-2.5, 5, 0);
+  cabeca.add(antenaL);
+
+  const antenaR = antenaL.clone();
+  antenaR.position.x = 2.5;
+  cabeca.add(antenaR);
+
+  cabeca.position.set(0, 5, 0);
+  robot.add(cabeca);
+
+  // Braços (esquerdo e direito)
+  function createBraco(side = 1) {
+    const braco = new THREE.Group();
+
+    // Braço superior
+    const superiorBraco = new THREE.Mesh(
+      new THREE.BoxGeometry(10, 4, 4),
+      new THREE.MeshStandardMaterial({ color: 0x0000ff })
+    );
+    superiorBraco.rotation.z = Math.PI / 2;
+    superiorBraco.position.set(12 * side, 0, -4);
+    braco.add(superiorBraco);
+
+    // Tubos de escape
+    const escape1 = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.75, 0.75, 10, 6),
+      new THREE.MeshStandardMaterial({ color: 0xffffff })
+    );
+    escape1.position.set(14.5 * side, 4, -4.5);
+    braco.add(escape1);
+
+    const escape2 = escape1.clone();
+    escape2.position.z = -3.5;
+    braco.add(escape2);
+
+    // Antebraço
+    const antebraco = new THREE.Mesh(
+      new THREE.BoxGeometry(4, 4,10),
+      new THREE.MeshStandardMaterial({ color: 0x0000ff })
+    );
+    antebraco.position.set(12 * side, -7, 3);
+    braco.add(antebraco);
+
+    return braco;
+  }
+  robot.add(createBraco(1));  // Direito
+  robot.add(createBraco(-1)); // Esquerdo
+
+  // Abdómen
+  const abdomen = new THREE.Mesh(
+    new THREE.BoxGeometry(12, 4, 12),
+    new THREE.MeshStandardMaterial({ color: 0xffffff })
+  );
+  abdomen.position.set(0, -7, 0);
+  robot.add(abdomen);
+
+  // Cintura
+  const cintura = new THREE.Mesh(
+    new THREE.BoxGeometry(20, 6, 12),
+    new THREE.MeshStandardMaterial({ color: 0xff0000 })
+  );
+  cintura.position.set(0, -12, 0);
+  robot.add(cintura);
+
+  // Coxas e pernas
+  function createPerna(side = 1) {
+    const perna = new THREE.Group();
+
+    // Coxa
+    const coxa = new THREE.Mesh(
+      new THREE.BoxGeometry(3, 4, 3),
+      new THREE.MeshStandardMaterial({ color: 0xffffff })
+    );
+    coxa.position.set(3 * side, -17, 0);
+    perna.add(coxa);
+
+    // Perna
+    const lowerPerna = new THREE.Mesh(
+      new THREE.BoxGeometry(4, 16, 4),
+      new THREE.MeshStandardMaterial({ color: 0x0000ff })
+    );
+    lowerPerna.position.set(3 * side, -27, 0);
+    perna.add(lowerPerna);
+
+    // Pé
+    const pe = new THREE.Mesh(
+      new THREE.BoxGeometry(4, 2, 4),
+      new THREE.MeshStandardMaterial({ color: 0x333333 })
+    );
+    pe.position.set(3 * side, -34, 4);
+    perna.add(pe);
+
+    return perna;
+  }
+  robot.add(createPerna(1));
+  robot.add(createPerna(-1));
+
+  // Rodas na cintura (direita e esquerda)
+  for (let side of [1, -1]) {
+    const wheel = new THREE.Mesh(
+      new THREE.CylinderGeometry(2, 2, 2, 16),
+      new THREE.MeshStandardMaterial({ color: 0x111111 })
+    );
+    wheel.rotation.z = Math.PI / 2;
+    wheel.position.set(11 * side, -12, 0); 
+    robot.add(wheel);
+  }
+
+  // Rodas nas pernas (direita e esquerda)
+  for (let side of [1, -1]) {
+    const wheel2 = new THREE.Mesh(
+      new THREE.CylinderGeometry(2, 2, 2, 16),
+      new THREE.MeshStandardMaterial({ color: 0x111111 })
+    );
+    wheel2.rotation.z = Math.PI / 2;
+    wheel2.position.set(5.5 * side, -32, 0);
+    robot.add(wheel2);
+
+    const wheel1 = new THREE.Mesh(
+      new THREE.CylinderGeometry(2, 2, 2, 16),
+      new THREE.MeshStandardMaterial({ color: 0x111111 })
+    );
+    wheel1.rotation.z = Math.PI / 2;
+    wheel1.position.set(5.5 * side, -27, 0); 
+    robot.add(wheel1);
+  }
+
+  robot.position.y = 0;
+
+  scene.add(robot);
+}
 
 //////////////////////
 /* CHECK COLLISIONS */
@@ -132,7 +310,7 @@ function animate() {
 ////////////////////////////
 function onResize() {
   const aspect = window.innerWidth / window.innerHeight;
-  const frustumSize = 60;
+  const frustumSize = 80;
 
   // Atualiza o tamanho da câmera
   ["frontal", "lateral", "topo"].forEach((key) => {
