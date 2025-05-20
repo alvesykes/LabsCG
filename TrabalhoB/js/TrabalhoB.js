@@ -10,6 +10,32 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 let camera, scene, renderer;
 let cameras = {};
 
+const state = {
+  theta1: 0, // pés
+  theta2: 0, // pernas
+  delta1: 0, // braços
+  theta3: 0, // cabeça
+};
+const limits = {
+  theta1: { min: 0, max: Math.PI },
+  theta2: { min: 0, max: Math.PI / 2 },
+  delta1: { min: -4, max: 0},
+  theta3: { min: -Math.PI / 2, max: 0},
+};
+const speed = {
+  theta: 0.02,
+  delta: 0.1,
+};
+
+let robotRefs = {
+  pes: [],
+  bracos: [],
+  cabeca: null,
+  pernas: [],
+};
+
+const keysPressed = {};
+
 /////////////////////
 /* CREATE SCENE(S) */
 /////////////////////
@@ -19,14 +45,7 @@ function createScene() {
 
   scene.add(new THREE.AxesHelper(10));
 
-  // Add lighting so MeshStandardMaterial shows colors
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-  scene.add(ambientLight);
-
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-  directionalLight.position.set(30, 50, 50);
-  scene.add(directionalLight);
-
+  createLight();
   createRobot();
   createReboque();
 }
@@ -86,6 +105,14 @@ function createCameras() {
 /////////////////////
 /* CREATE LIGHT(S) */
 /////////////////////
+function createLight() {
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+  scene.add(ambientLight);
+
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  directionalLight.position.set(30, 50, 50);
+  scene.add(directionalLight);
+}
 
 ////////////////////////
 /* CREATE OBJECT3D(S) */
@@ -138,6 +165,7 @@ function createRobot() {
 
   cabeca.position.set(0, 5, 0);
   robot.add(cabeca);
+  robotRefs.cabeca = cabeca;
 
   // Braços (esquerdo e direito)
   function createBraco(side = 1) {
@@ -166,7 +194,7 @@ function createRobot() {
 
     // Antebraço
     const antebraco = new THREE.Mesh(
-      new THREE.BoxGeometry(4, 4,10),
+      new THREE.BoxGeometry(4, 4, 10),
       new THREE.MeshStandardMaterial({ color: 0x0000ff })
     );
     antebraco.position.set(12 * side, -7, 3);
@@ -174,8 +202,11 @@ function createRobot() {
 
     return braco;
   }
-  robot.add(createBraco(1));  // Direito
-  robot.add(createBraco(-1)); // Esquerdo
+  const bracoD = createBraco(1);  // Direito
+  const bracoE = createBraco(-1); // Esquerdo
+  robot.add(bracoD);
+  robot.add(bracoE);
+  robotRefs.bracos = [bracoD, bracoE];
 
   // Abdómen
   const abdomen = new THREE.Mesh(
@@ -186,11 +217,29 @@ function createRobot() {
   robot.add(abdomen);
 
   // Cintura
-  const cintura = new THREE.Mesh(
-    new THREE.BoxGeometry(20, 6, 12),
-    new THREE.MeshStandardMaterial({ color: 0xff0000 })
-  );
-  cintura.position.set(0, -12, 0);
+  function createCintura() {
+    const cintura = new THREE.Group();
+
+    const cinturaBase = new THREE.Mesh(
+      new THREE.BoxGeometry(20, 6, 12),
+      new THREE.MeshStandardMaterial({ color: 0xff0000 })
+    );
+    cinturaBase.position.set(0, -12, 0);
+    cintura.add(cinturaBase);
+
+    // Rodas na cintura (direita e esquerda)
+    for (let side of [1, -1]) {
+      const wheel = new THREE.Mesh(
+        new THREE.CylinderGeometry(2, 2, 2, 16),
+        new THREE.MeshStandardMaterial({ color: 0x111111 })
+      );
+      wheel.rotation.z = Math.PI / 2;
+      wheel.position.set(11 * side, -12, 0); 
+      cintura.add(wheel);
+    }
+    return cintura;
+  }
+  const cintura = createCintura();
   robot.add(cintura);
 
   // Coxas e pernas
@@ -213,48 +262,43 @@ function createRobot() {
     lowerPerna.position.set(3 * side, -27, 0);
     perna.add(lowerPerna);
 
-    // Pé
+    // Rodas nas pernas (direita e esquerda)
+    for (let side of [1, -1]) {
+      const wheel2 = new THREE.Mesh(
+        new THREE.CylinderGeometry(2, 2, 2, 16),
+        new THREE.MeshStandardMaterial({ color: 0x111111 })
+      );
+      wheel2.rotation.z = Math.PI / 2;
+      wheel2.position.set(5.5 * side, -32, 0);
+      perna.add(wheel2);
+
+      const wheel1 = new THREE.Mesh(
+        new THREE.CylinderGeometry(2, 2, 2, 16),
+        new THREE.MeshStandardMaterial({ color: 0x111111 })
+      );
+      wheel1.rotation.z = Math.PI / 2;
+      wheel1.position.set(5.5 * side, -27, 0);
+      perna.add(wheel1);
+    }
+
+    // Pé 
     const pe = new THREE.Mesh(
       new THREE.BoxGeometry(4, 2, 4),
       new THREE.MeshStandardMaterial({ color: 0x333333 })
     );
-    pe.position.set(3 * side, -34, 4);
+    pe.position.set(3 *side, -34, 4);
+    
     perna.add(pe);
+    robotRefs.pes.push(pe);
 
     return perna;
   }
-  robot.add(createPerna(1));
-  robot.add(createPerna(-1));
 
-  // Rodas na cintura (direita e esquerda)
-  for (let side of [1, -1]) {
-    const wheel = new THREE.Mesh(
-      new THREE.CylinderGeometry(2, 2, 2, 16),
-      new THREE.MeshStandardMaterial({ color: 0x111111 })
-    );
-    wheel.rotation.z = Math.PI / 2;
-    wheel.position.set(11 * side, -12, 0); 
-    robot.add(wheel);
-  }
-
-  // Rodas nas pernas (direita e esquerda)
-  for (let side of [1, -1]) {
-    const wheel2 = new THREE.Mesh(
-      new THREE.CylinderGeometry(2, 2, 2, 16),
-      new THREE.MeshStandardMaterial({ color: 0x111111 })
-    );
-    wheel2.rotation.z = Math.PI / 2;
-    wheel2.position.set(5.5 * side, -32, 0);
-    robot.add(wheel2);
-
-    const wheel1 = new THREE.Mesh(
-      new THREE.CylinderGeometry(2, 2, 2, 16),
-      new THREE.MeshStandardMaterial({ color: 0x111111 })
-    );
-    wheel1.rotation.z = Math.PI / 2;
-    wheel1.position.set(5.5 * side, -27, 0); 
-    robot.add(wheel1);
-  }
+  const pernaD = createPerna(1);  // Direita
+  const pernaE = createPerna(-1); // Esquerda
+  robot.add(pernaD);
+  robot.add(pernaE);
+  robotRefs.pernas = [pernaD, pernaE];
 
   robot.position.y = 0;
 
@@ -320,7 +364,26 @@ function handleCollisions() {}
 ////////////
 /* UPDATE */
 ////////////
-function update() {}
+function update() {
+  // θ1: pés 
+  for (const pe of robotRefs.pes) {
+    pe.rotation.x = state.theta1;
+  }
+  // θ2: pernas
+  if (robotRefs.pernas) {
+    robotRefs.pernas[0].rotation.x = state.theta2;
+    robotRefs.pernas[1].rotation.x = state.theta2;
+  }
+  // δ1: braços 
+  if (robotRefs.bracos) {
+    robotRefs.bracos[0].position.x = state.delta1;  // direito
+    robotRefs.bracos[1].position.x = -state.delta1; // esquerdo
+  }
+  // θ3: cabeça 
+  if (robotRefs.cabeca) {
+    robotRefs.cabeca.rotation.x = state.theta3;
+  }
+}
 
 /////////////
 /* DISPLAY */
@@ -348,6 +411,7 @@ function init() {
 /* ANIMATION CYCLE */
 /////////////////////
 function animate() {
+  update();
   render();
   requestAnimationFrame(animate);
 }
@@ -383,6 +447,7 @@ function onResize() {
 /* KEY DOWN CALLBACK */
 ///////////////////////
 function onKeyDown(e) {
+  keysPressed[e.key.toLowerCase()] = true;
   switch (e.key) {
     case "1":
       camera = cameras.frontal;
@@ -396,15 +461,46 @@ function onKeyDown(e) {
     case "4":
       camera = cameras.perspetiva;
       break;
+    // θ1: Q/A
+    case "q":
+      state.theta1 = Math.min(state.theta1 + speed.theta, limits.theta1.max);
+      break;
+    case "a":
+      state.theta1 = Math.max(state.theta1 - speed.theta, limits.theta1.min);
+      break;
+    // θ2: W/S
+    case "w":
+      state.theta2 = Math.min(state.theta2 + speed.theta, limits.theta2.max);
+      break;
+    case "s":
+      state.theta2 = Math.max(state.theta2 - speed.theta, limits.theta2.min);
+      break;
+    // δ1: E/D
+    case "e":
+      state.delta1 = Math.min(state.delta1 + speed.delta, limits.delta1.max);
+      break;
+    case "d":
+      state.delta1 = Math.max(state.delta1 - speed.delta, limits.delta1.min);
+      break;
+    // θ3: R/F
+    case "r":
+      state.theta3 = Math.min(state.theta3 + speed.theta, limits.theta3.max);
+      break;
+    case "f":
+      state.theta3 = Math.max(state.theta3 - speed.theta, limits.theta3.min);
+      break;
     default:
       break;
   }
+
 }
 
 ///////////////////////
 /* KEY UP CALLBACK */
 ///////////////////////
-function onKeyUp(e) {}
+function onKeyUp(e) {
+  keysPressed[e.key.toLowerCase()] = false;
+}
 
 init();
 animate();
