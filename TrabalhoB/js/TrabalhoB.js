@@ -28,6 +28,7 @@ function createScene() {
   scene.add(directionalLight);
 
   createRobot();
+  createReboque();
 }
 
 //////////////////////
@@ -258,6 +259,52 @@ function createRobot() {
   robot.position.y = 0;
 
   scene.add(robot);
+}
+
+function createReboque() {
+  const reboque = new THREE.Group();
+
+  // Contentor (caixa principal)
+  const contentor = new THREE.Mesh(
+    new THREE.BoxGeometry(32, 12, 20),
+    new THREE.MeshStandardMaterial({ color: 0x888888 })
+  );
+  contentor.position.set(0, 6, 0);
+  reboque.add(contentor);
+
+  // Peça de ligação (barra)
+  const ligacao = new THREE.Mesh(
+    new THREE.BoxGeometry(6, 2, 2),
+    new THREE.MeshStandardMaterial({ color: 0x333333 })
+  );
+  ligacao.position.set(-16, 2, 0);
+  reboque.add(ligacao);
+
+  // Rodas (4)
+  const rodaOffsets = [
+    [12, -2, 8],   // frente direita
+    [12, -2, -8],  // frente esquerda
+    [8, -2, 8],  // trás direita
+    [8, -2, -8], // trás esquerda
+  ];
+  for (let [x, y, z] of rodaOffsets) {
+    const roda = new THREE.Mesh(
+      new THREE.CylinderGeometry(2, 2, 2, 16),
+      new THREE.MeshStandardMaterial({ color: 0x111111 })
+    );
+    roda.rotation.z = Math.PI / 2;
+    roda.rotation.y = Math.PI / 2;
+    roda.position.set(x, y, z);
+    reboque.add(roda);
+  }
+
+  // Rodar o reboque para ficar de frente para a camera frontal
+  reboque.rotation.y = Math.PI / 2;
+
+  // Posiciona o reboque atrás do camião (ajuste conforme necessário)
+  reboque.position.set(-30, 0, 0);
+
+  scene.add(reboque);
 }
 
 //////////////////////
