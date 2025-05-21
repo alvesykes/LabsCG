@@ -189,7 +189,7 @@ function createRobot() {
     new THREE.CylinderGeometry(0.5, 0.5, 1, 6),
     new THREE.MeshStandardMaterial({ color: 0x000000 })
   );
-  meshes.olhoLMesh = cabecaPrincipal;
+  meshes.olhoLMesh = olhoL;
   olhoL.rotation.x = Math.PI / 2;
   olhoL.position.set(-1.2, 4.2, 1.8);
   cabeca.add(olhoL);
@@ -205,6 +205,7 @@ function createRobot() {
     new THREE.CylinderGeometry(0.5, 0.5, 2.5, 6),
     new THREE.MeshStandardMaterial({ color: 0xff0000 })
   );
+  meshes.antenaLMesh = antenaL;
   antenaL.position.set(-2.5, 5, 0);
   cabeca.add(antenaL);
 
@@ -227,6 +228,7 @@ function createRobot() {
       new THREE.BoxGeometry(10, 4, 4),
       new THREE.MeshStandardMaterial({ color: 0x0000ff })
     );
+    meshes.superiorBracoMesh = superiorBraco;
     superiorBraco.rotation.z = Math.PI / 2;
     superiorBraco.position.set(12 * side, 0, -4);
     superiorBraco.geometry.computeBoundingBox();
@@ -237,6 +239,7 @@ function createRobot() {
       new THREE.CylinderGeometry(0.75, 0.75, 10, 6),
       new THREE.MeshStandardMaterial({ color: 0xffffff })
     );
+    meshes.escape1Mesh = escape1;
     escape1.position.set(14.5 * side, 4, -4.5);
     braco.add(escape1);
 
@@ -251,6 +254,7 @@ function createRobot() {
       new THREE.BoxGeometry(4, 4, 10),
       new THREE.MeshStandardMaterial({ color: 0x0000ff })
     );
+    meshes.antebracoMesh = antebraco;
     antebraco.position.set(12 * side, -7, 3);
     antebraco.geometry.computeBoundingBox();
     braco.add(antebraco);
@@ -268,6 +272,7 @@ function createRobot() {
     new THREE.BoxGeometry(12, 4, 12),
     new THREE.MeshStandardMaterial({ color: 0xffffff })
   );
+  meshes.abdomenMesh = abdomen;
   abdomen.position.set(0, -7, 0);
   abdomen.geometry.computeBoundingBox();
   robot.add(abdomen);
@@ -280,6 +285,7 @@ function createRobot() {
       new THREE.BoxGeometry(20, 6, 12),
       new THREE.MeshStandardMaterial({ color: 0xff0000 })
     );
+    meshes.cinturaBaseMesh = cinturaBase;
     cinturaBase.position.set(0, -12, 0);
     cinturaBase.geometry.computeBoundingBox();
     cintura.add(cinturaBase);
@@ -291,6 +297,7 @@ function createRobot() {
         new THREE.CylinderGeometry(2, 2, 2, 16),
         new THREE.MeshStandardMaterial({ color: 0x111111 })
       );
+      meshes.wheelMesh = wheel;
       wheel.rotation.z = Math.PI / 2;
       wheel.position.set(11 * side, -12, 0); 
       wheel.geometry.computeBoundingBox();
@@ -310,6 +317,7 @@ function createRobot() {
       new THREE.BoxGeometry(3, 4, 3),
       new THREE.MeshStandardMaterial({ color: 0xffffff })
     );
+    meshes.coxaMesh = coxa;
     coxa.position.set(3 * side, -17, 0);
     perna.add(coxa);
     coxa.geometry.computeBoundingBox();
@@ -319,6 +327,7 @@ function createRobot() {
       new THREE.BoxGeometry(4, 16, 4),
       new THREE.MeshStandardMaterial({ color: 0x0000ff })
     );
+    meshes.lowerPernaMesh = lowerPerna;
     lowerPerna.position.set(3 * side, -27, 0);
     perna.add(lowerPerna);
     lowerPerna.geometry.computeBoundingBox();
@@ -329,6 +338,7 @@ function createRobot() {
         new THREE.CylinderGeometry(2, 2, 2, 16),
         new THREE.MeshStandardMaterial({ color: 0x111111 })
       );
+      meshes.wheel2Mesh = wheel2;
       wheel2.rotation.z = Math.PI / 2;
       wheel2.position.set(5.5 * side, -32, 0);
       wheel2.geometry.computeBoundingBox();
@@ -338,6 +348,7 @@ function createRobot() {
         new THREE.CylinderGeometry(2, 2, 2, 16),
         new THREE.MeshStandardMaterial({ color: 0x111111 })
       );
+      meshes.wheel1Mesh = wheel1;
       wheel1.rotation.z = Math.PI / 2;
       wheel1.position.set(5.5 * side, -27, 0);
       wheel1.geometry.computeBoundingBox();
@@ -349,6 +360,7 @@ function createRobot() {
       new THREE.BoxGeometry(4, 2, 4),
       new THREE.MeshStandardMaterial({ color: 0x333333 })
     );
+    meshes.peMesh = pe;
     pe.position.set(3 *side, -34, 4);
     pe.geometry.computeBoundingBox();
     perna.add(pe);
