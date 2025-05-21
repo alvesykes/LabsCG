@@ -42,6 +42,18 @@ let reboqueRefs = {
 }
 
 const keysPressed = {};
+const reboqueBox = new THREE.Box3();
+const troncoBox = new THREE.Box3();
+const cabecaBox = new THREE.Box3();
+const olhoBox = new THREE.Box3();
+const antenaBox = new THREE.Box3();
+const bracoBox = new THREE.Box3();
+const escapeBox = new THREE.Box3();
+const abdomenBox = new THREE.Box3();
+const cinturaBaseBox = new THREE.Box3();
+const pernaBox = new THREE.Box3();
+const wheelBox = new THREE.Box3();
+const peBox = new THREE.Box3();
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -134,6 +146,7 @@ function createRobot() {
     new THREE.MeshStandardMaterial({ color: 0xff0000 })
   );
   tronco.position.set(0, 0, 0);
+
   robot.add(tronco);
 
   // Cabeça
@@ -548,4 +561,7 @@ function onKeyUp(e) {
 init();
 animate();
 
-//To do: ver teclas ao mesmo tempo
+//To do: 
+// ver teclas ao mesmo tempo
+// por tudo como bracoL ou bracoE (sem trocar de pt para inglês)
+
