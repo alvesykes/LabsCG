@@ -147,6 +147,7 @@ function createRobot() {
   );
   tronco.position.set(0, 0, 0);
 
+  tronco.geometry.computeBoundingBox();
   robot.add(tronco);
 
   // Cabeça
@@ -157,6 +158,7 @@ function createRobot() {
   );
   cabecaPrincipal.position.set(0, 2.5, 0);
   cabeca.add(cabecaPrincipal);
+  cabecaPrincipal.geometry.computeBoundingBox();
 
   // Olhos 
   const olhoL = new THREE.Mesh(
@@ -170,6 +172,8 @@ function createRobot() {
   const olhoR = olhoL.clone();
   olhoR.position.x = 1.2;
   cabeca.add(olhoR);
+  olhoL.geometry.computeBoundingBox();
+  olhoR.geometry.computeBoundingBox();
 
   // Antenas
   const antenaL = new THREE.Mesh(
@@ -186,6 +190,8 @@ function createRobot() {
   cabeca.position.set(0, 5, 0);
   robot.add(cabeca);
   robotRefs.cabeca = cabeca;
+  antenaL.geometry.computeBoundingBox();
+  antenaR.geometry.computeBoundingBox();
 
   // Braços (esquerdo e direito)
   function createBraco(side = 1) {
@@ -198,6 +204,7 @@ function createRobot() {
     );
     superiorBraco.rotation.z = Math.PI / 2;
     superiorBraco.position.set(12 * side, 0, -4);
+    superiorBraco.geometry.computeBoundingBox();
     braco.add(superiorBraco);
 
     // Tubos de escape
@@ -211,6 +218,8 @@ function createRobot() {
     const escape2 = escape1.clone();
     escape2.position.z = -3.5;
     braco.add(escape2);
+    escape1.geometry.computeBoundingBox();
+    escape2.geometry.computeBoundingBox();
 
     // Antebraço
     const antebraco = new THREE.Mesh(
@@ -218,6 +227,7 @@ function createRobot() {
       new THREE.MeshStandardMaterial({ color: 0x0000ff })
     );
     antebraco.position.set(12 * side, -7, 3);
+    antebraco.geometry.computeBoundingBox();
     braco.add(antebraco);
 
     return braco;
@@ -234,6 +244,7 @@ function createRobot() {
     new THREE.MeshStandardMaterial({ color: 0xffffff })
   );
   abdomen.position.set(0, -7, 0);
+  abdomen.geometry.computeBoundingBox();
   robot.add(abdomen);
 
   // Cintura
@@ -246,6 +257,7 @@ function createRobot() {
     );
     cinturaBase.position.set(0, -12, 0);
     cintura.add(cinturaBase);
+    cintura.geometry.computeBoundingBox();
 
     // Rodas na cintura (direita e esquerda)
     for (let side of [1, -1]) {
@@ -255,6 +267,7 @@ function createRobot() {
       );
       wheel.rotation.z = Math.PI / 2;
       wheel.position.set(11 * side, -12, 0); 
+      wheel.geometry.computeBoundingBox();
       cintura.add(wheel);
     }
     return cintura;
@@ -273,6 +286,7 @@ function createRobot() {
     );
     coxa.position.set(3 * side, -17, 0);
     perna.add(coxa);
+    coxa.geometry.computeBoundingBox();
 
     // Perna
     const lowerPerna = new THREE.Mesh(
@@ -281,6 +295,7 @@ function createRobot() {
     );
     lowerPerna.position.set(3 * side, -27, 0);
     perna.add(lowerPerna);
+    lowerPerna.geometry.computeBoundingBox();
 
     // Rodas nas pernas (direita e esquerda)
     for (let side of [1, -1]) {
@@ -290,6 +305,7 @@ function createRobot() {
       );
       wheel2.rotation.z = Math.PI / 2;
       wheel2.position.set(5.5 * side, -32, 0);
+      wheell2.geometry.computeBoundingBox();
       perna.add(wheel2);
 
       const wheel1 = new THREE.Mesh(
@@ -298,6 +314,7 @@ function createRobot() {
       );
       wheel1.rotation.z = Math.PI / 2;
       wheel1.position.set(5.5 * side, -27, 0);
+      wheell1.geometry.computeBoundingBox();
       perna.add(wheel1);
     }
 
@@ -307,7 +324,7 @@ function createRobot() {
       new THREE.MeshStandardMaterial({ color: 0x333333 })
     );
     pe.position.set(3 *side, -34, 4);
-    
+    pe.geometry.computeBoundingBox();
     perna.add(pe);
     robotRefs.pes.push(pe);
 
@@ -368,6 +385,7 @@ function createReboque() {
   // Posiciona o reboque atrás do camião (ajuste conforme necessário)
   reboque.position.set(0, -20, -40);
   reboqueRefs.reboque = reboque;
+  reboque.geometry.computeBoundingBox();
   scene.add(reboque);
 }
 
