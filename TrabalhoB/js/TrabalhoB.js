@@ -256,6 +256,7 @@ function createRobot() {
       new THREE.MeshStandardMaterial({ color: 0xff0000 })
     );
     cinturaBase.position.set(0, -12, 0);
+    cinturaBase.geometry.computeBoundingBox();
     cintura.add(cinturaBase);
     cinturaBase.geometry.computeBoundingBox();
 
