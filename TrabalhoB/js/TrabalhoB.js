@@ -256,8 +256,8 @@ function createRobot() {
       new THREE.MeshStandardMaterial({ color: 0xff0000 })
     );
     cinturaBase.position.set(0, -12, 0);
+    cinturaBase.geometry.computeBoundingBox();
     cintura.add(cinturaBase);
-    cintura.geometry.computeBoundingBox();
 
     // Rodas na cintura (direita e esquerda)
     for (let side of [1, -1]) {
