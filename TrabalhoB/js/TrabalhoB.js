@@ -54,6 +54,9 @@ const cinturaBaseBox = new THREE.Box3();
 const pernaBox = new THREE.Box3();
 const wheelBox = new THREE.Box3();
 const peBox = new THREE.Box3();
+const ligacaoBox = new THREE.Box3();
+const rodaBox = new THREE.Box3();
+const contentorBox = new THREE.Box3();
 
 /////////////////////
 /* CREATE SCENE(S) */
