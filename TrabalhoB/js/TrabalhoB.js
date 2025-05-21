@@ -29,6 +29,26 @@ const speed = {
   theta: 0.02,
   delta: 0.1,
 };
+const meshes = {
+  troncoMesh: null,
+  cabecaPrincipalMesh: null,
+  olhoLMesh: null,
+  antenaLMesh: null,
+  superiorBracoMesh: null,
+  escape1Mesh: null,
+  antebracoMesh: null,
+  abdomenMesh: null,
+  cinturaBaseMesh: null,
+  wheelMesh: null,
+  coxaMesh: null,
+  lowerPernaMesh: null,
+  wheel2Mesh: null,
+  wheel1Mesh: null,
+  peMesh: null,
+  contentorMesh: null,
+  ligacaoMesh: null,
+  rodaMesh: null,
+};
 
 let robotRefs = {
   pes: [],
@@ -159,6 +179,7 @@ function createRobot() {
     new THREE.CylinderGeometry(2.5, 2.5, 5, 6),
     new THREE.MeshStandardMaterial({ color: 0x0000ff })
   );
+  meshes.cabecaPrincipalMesh = cabecaPrincipal;
   cabecaPrincipal.position.set(0, 2.5, 0);
   cabeca.add(cabecaPrincipal);
   cabecaPrincipal.geometry.computeBoundingBox();
@@ -168,6 +189,7 @@ function createRobot() {
     new THREE.CylinderGeometry(0.5, 0.5, 1, 6),
     new THREE.MeshStandardMaterial({ color: 0x000000 })
   );
+  meshes.olhoLMesh = cabecaPrincipal;
   olhoL.rotation.x = Math.PI / 2;
   olhoL.position.set(-1.2, 4.2, 1.8);
   cabeca.add(olhoL);
@@ -412,6 +434,7 @@ function update() {
   // θ1: pés 
   for (const pe of robotRefs.pes) {
     pe.rotation.x = state.theta1;
+    peBox.copy(geometry.boundingBox)
   }
   // θ2: pernas
   if (robotRefs.pernas) {
