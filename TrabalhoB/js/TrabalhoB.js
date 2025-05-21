@@ -9,6 +9,7 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 //////////////////////
 let camera, scene, renderer;
 let cameras = {};
+let wireframeMode = false;
 
 const state = {
   theta1: 0, // pés
@@ -477,6 +478,20 @@ function onKeyDown(e) {
     case "4":
       camera = cameras.perspetiva;
       break;
+    case "7":
+      // alternar modelo arames e solida
+      wireframeMode = !wireframeMode;
+      scene.traverse((child) => {
+      if (child.isMesh && child.material) {
+        if (Array.isArray(child.material)) {
+          child.material.forEach((mat) => (mat.wireframe = wireframeMode));
+        } else {
+          child.material.wireframe = wireframeMode;
+        }
+      }
+      });
+      break;
+    
     // θ1: Q/A
     case "q":
       state.theta1 = Math.min(state.theta1 + speed.theta, limits.theta1.max);
