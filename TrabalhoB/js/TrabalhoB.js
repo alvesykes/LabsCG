@@ -15,6 +15,8 @@ const state = {
   theta2: 0, // pernas
   delta1: 0, // braços
   theta3: 0, // cabeça
+  x:0, //Posição x do reboque
+  y:-40, //Posição y do reboque
 };
 const limits = {
   theta1: { min: 0, max: Math.PI },
@@ -33,6 +35,10 @@ let robotRefs = {
   cabeca: null,
   pernas: [],
 };
+
+let reboqueRefs = {
+  reboque: null,
+}
 
 const keysPressed = {};
 
@@ -346,8 +352,8 @@ function createReboque() {
   reboque.rotation.y = Math.PI / 2;
 
   // Posiciona o reboque atrás do camião (ajuste conforme necessário)
-  reboque.position.set(-30, 0, 0);
-
+  reboque.position.set(0, -20, -40);
+  reboqueRefs.reboque = reboque;
   scene.add(reboque);
 }
 
@@ -383,6 +389,16 @@ function update() {
   if (robotRefs.cabeca) {
     robotRefs.cabeca.rotation.x = state.theta3;
   }
+  // x: Reboque 
+  if (reboqueRefs.reboque) {
+    reboqueRefs.reboque.x = state.x;
+  }
+
+  // x: Reboque 
+  if (reboqueRefs.reboque) {
+    reboqueRefs.reboque.y = state.y;
+  }
+  
 }
 
 /////////////
@@ -489,6 +505,18 @@ function onKeyDown(e) {
     case "f":
       state.theta3 = Math.max(state.theta3 - speed.theta, limits.theta3.min);
       break;
+    case "ArrowUp":
+      reboqueRefs.reboque.position.z -= 0.5;
+      break;
+    case "ArrowDown":
+      reboqueRefs.reboque.position.z += 0.5;
+      break;
+    case "ArrowLeft":
+      reboqueRefs.reboque.position.x -= 0.5;
+      break;
+    case "ArrowRight":
+      reboqueRefs.reboque.position.x += 0.5;
+      break;
     default:
       break;
   }
@@ -504,3 +532,5 @@ function onKeyUp(e) {
 
 init();
 animate();
+
+//To do: ver teclas ao mesmo tempo
