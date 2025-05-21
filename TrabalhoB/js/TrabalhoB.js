@@ -257,7 +257,7 @@ function createRobot() {
     );
     cinturaBase.position.set(0, -12, 0);
     cintura.add(cinturaBase);
-    cintura.geometry.computeBoundingBox();
+    cinturaBase.geometry.computeBoundingBox();
 
     // Rodas na cintura (direita e esquerda)
     for (let side of [1, -1]) {
@@ -305,7 +305,7 @@ function createRobot() {
       );
       wheel2.rotation.z = Math.PI / 2;
       wheel2.position.set(5.5 * side, -32, 0);
-      wheell2.geometry.computeBoundingBox();
+      wheel2.geometry.computeBoundingBox();
       perna.add(wheel2);
 
       const wheel1 = new THREE.Mesh(
@@ -314,7 +314,7 @@ function createRobot() {
       );
       wheel1.rotation.z = Math.PI / 2;
       wheel1.position.set(5.5 * side, -27, 0);
-      wheell1.geometry.computeBoundingBox();
+      wheel1.geometry.computeBoundingBox();
       perna.add(wheel1);
     }
 
@@ -351,6 +351,7 @@ function createReboque() {
     new THREE.MeshStandardMaterial({ color: 0x888888 })
   );
   contentor.position.set(0, 6, 0);
+  contentor.geometry.computeBoundingBox();
   reboque.add(contentor);
 
   // Peça de ligação (barra)
@@ -359,6 +360,7 @@ function createReboque() {
     new THREE.MeshStandardMaterial({ color: 0x333333 })
   );
   ligacao.position.set(-16, 2, 0);
+  ligacao.geometry.computeBoundingBox();
   reboque.add(ligacao);
 
   // Rodas (4)
@@ -376,6 +378,7 @@ function createReboque() {
     roda.rotation.z = Math.PI / 2;
     roda.rotation.y = Math.PI / 2;
     roda.position.set(x, y, z);
+    roda.geometry.computeBoundingBox();
     reboque.add(roda);
   }
 
@@ -385,7 +388,6 @@ function createReboque() {
   // Posiciona o reboque atrás do camião (ajuste conforme necessário)
   reboque.position.set(0, -20, -40);
   reboqueRefs.reboque = reboque;
-  reboque.geometry.computeBoundingBox();
   scene.add(reboque);
 }
 
