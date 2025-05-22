@@ -20,10 +20,10 @@ const state = {
   y:-40, //Posição y do reboque
 };
 const limits = {
-  theta1: { min: 0, max: Math.PI },
+  theta1: { min: 0, max:  Math.PI},
   theta2: { min: 0, max: Math.PI / 2 },
   delta1: { min: -4, max: 0},
-  theta3: { min: -Math.PI / 2, max: 0},
+  theta3: { min: -Math.PI , max: 0},
 };
 const speed = {
   theta: 0.02,
@@ -299,7 +299,7 @@ function createRobot() {
       );
       meshes.wheelMesh = wheel;
       wheel.rotation.z = Math.PI / 2;
-      wheel.position.set(11 * side, -12, 0); 
+      wheel.position.set(11 * side, -15, 0); 
       wheel.geometry.computeBoundingBox();
       cintura.add(wheel);
     }
@@ -307,6 +307,12 @@ function createRobot() {
   }
   const cintura = createCintura();
   robot.add(cintura);
+
+  // Pivots para rodar as pernas
+  const pivotD = new THREE.Group();
+  const pivotE = new THREE.Group();
+  pivotD.position.set(0, -12, 0);
+  pivotE.position.set(0, -12, 0);
 
   // Coxas e pernas
   function createPerna(side = 1) {
@@ -318,7 +324,7 @@ function createRobot() {
       new THREE.MeshStandardMaterial({ color: 0xffffff })
     );
     meshes.coxaMesh = coxa;
-    coxa.position.set(3 * side, -17, 0);
+    coxa.position.set(3 * side, -5, 0);
     perna.add(coxa);
     coxa.geometry.computeBoundingBox();
 
@@ -328,7 +334,7 @@ function createRobot() {
       new THREE.MeshStandardMaterial({ color: 0x0000ff })
     );
     meshes.lowerPernaMesh = lowerPerna;
-    lowerPerna.position.set(3 * side, -27, 0);
+    lowerPerna.position.set(3 * side, -15, 0);
     perna.add(lowerPerna);
     lowerPerna.geometry.computeBoundingBox();
 
@@ -340,7 +346,7 @@ function createRobot() {
       );
       meshes.wheel2Mesh = wheel2;
       wheel2.rotation.z = Math.PI / 2;
-      wheel2.position.set(5.5 * side, -32, 0);
+      wheel2.position.set(5.5 * side, -19, 3);
       wheel2.geometry.computeBoundingBox();
       perna.add(wheel2);
 
@@ -350,30 +356,35 @@ function createRobot() {
       );
       meshes.wheel1Mesh = wheel1;
       wheel1.rotation.z = Math.PI / 2;
-      wheel1.position.set(5.5 * side, -27, 0);
+      wheel1.position.set(5.5 * side, -14, 3);
       wheel1.geometry.computeBoundingBox();
       perna.add(wheel1);
     }
 
     // Pé 
+    const pivotPe = new THREE.Group();
+    pivotPe.position.set(0, -23, 2);
     const pe = new THREE.Mesh(
       new THREE.BoxGeometry(4, 2, 4),
       new THREE.MeshStandardMaterial({ color: 0x333333 })
     );
     meshes.peMesh = pe;
-    pe.position.set(3 *side, -34, 4);
+    pe.position.set(3 *side, 1, 2);
     pe.geometry.computeBoundingBox();
-    perna.add(pe);
-    robotRefs.pes.push(pe);
+    pivotPe.add(pe);
+    perna.add(pivotPe);
+    robotRefs.pes.push(pivotPe);
 
     return perna;
   }
 
   const pernaD = createPerna(1);  // Direita
   const pernaE = createPerna(-1); // Esquerda
-  robot.add(pernaD);
-  robot.add(pernaE);
-  robotRefs.pernas = [pernaD, pernaE];
+  pivotD.add(pernaD);
+  pivotE.add(pernaE);
+  robot.add(pivotD);
+  robot.add(pivotE);
+  robotRefs.pernas = [pivotD, pivotE];
 
   robot.position.y = 0;
 
@@ -403,10 +414,10 @@ function createReboque() {
 
   // Rodas (4)
   const rodaOffsets = [
-    [12, -2, 8],   // frente direita
-    [12, -2, -8],  // frente esquerda
-    [8, -2, 8],  // trás direita
-    [8, -2, -8], // trás esquerda
+    [12, -1, 8],   // frente direita
+    [12, -1, -8],  // frente esquerda
+    [8, -1, 8],  // trás direita
+    [8, -1, -8], // trás esquerda
   ];
   for (let [x, y, z] of rodaOffsets) {
     const roda = new THREE.Mesh(
@@ -424,7 +435,7 @@ function createReboque() {
   reboque.rotation.y = Math.PI / 2;
 
   // Posiciona o reboque atrás do camião (ajuste conforme necessário)
-  reboque.position.set(0, -20, -40);
+  reboque.position.set(0, -14, -40);
   reboqueRefs.reboque = reboque;
   scene.add(reboque);
 }
@@ -457,6 +468,9 @@ function update() {
   if (robotRefs.bracos) {
     robotRefs.bracos[0].position.x = state.delta1;  // direito
     robotRefs.bracos[1].position.x = -state.delta1; // esquerdo
+    robotRefs.bracos[0].position.z = state.delta1;  // direito
+    robotRefs.bracos[1].position.z = state.delta1; // esquerdo
+    
   }
   // θ3: cabeça 
   if (robotRefs.cabeca) {
