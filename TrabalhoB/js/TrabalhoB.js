@@ -457,7 +457,7 @@ function update() {
   // θ1: pés 
   for (const pe of robotRefs.pes) {
     pe.rotation.x = state.theta1;
-    peBox.copy(geometry.boundingBox)
+    //peBox.copy(geometry.boundingBox)
   }
   // θ2: pernas
   if (robotRefs.pernas) {
