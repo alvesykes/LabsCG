@@ -73,7 +73,8 @@ const boxes = {
   olhoBox: new THREE.Box3(),
   antenaBox: new THREE.Box3(),
   bracoBox: new THREE.Box3(),
-  escapeBox: new THREE.Box3(),
+  escape1Box: new THREE.Box3(),
+  escape2Box: new THREE.Box3(),
   abdomenBox: new THREE.Box3(),
   cinturaBaseBox: new THREE.Box3(),
   lowerPernaBox: new THREE.Box3(),
@@ -460,7 +461,7 @@ function createReboque() {
 /* CHECK COLLISIONS */
 //////////////////////
 function checkCollisions() {
-  if (peBox.intersectsBox(ligacaoBox)) {
+  if (boxes.peBox.intersectsBox(boxes.ligacaoBox)) {
     console.log("Collision detected between foot and trailer linkage!");
     handleTruckCollision();
   }
@@ -474,7 +475,7 @@ function handleTruckCollision(){
   const peCenter = new THREE.Vector3();
   const ligacaoCenter = new THREE.Vector3();
   boxes.peBox.getCenter(peCenter);
-  ligacaoBox.getCenter(ligacaoCenter);
+  boxes.ligacaoBox.getCenter(ligacaoCenter);
   const offset = new THREE.Vector3().subVectors(peCenter, ligacaoCenter);
   reboqueRefs.reboque.position.add(offset);
 }
@@ -516,22 +517,22 @@ function update() {
   }
   // θ3: cabeça 
   if (robotRefs.cabeca) {
-    cabecaBox.copy(meshes.cabecaPrincipalMesh.geometry.boundingBox).applyMatrix4(meshes.cabecaPrincipalMesh.matrixWorld);
+    boxes.cabecaBox.copy(meshes.cabecaPrincipalMesh.geometry.boundingBox).applyMatrix4(meshes.cabecaPrincipalMesh.matrixWorld);
     robotRefs.cabeca.rotation.x = state.theta3;
   }
   // x: Reboque 
   if (reboqueRefs.reboque) {
-    ligacaoBox.copy(meshes.ligacaoMesh.geometry.boundingBox).applyMatrix4(meshes.ligacaoMesh.matrixWorld);
-    contentorBox.copy(meshes.contentorMesh.geometry.boundingBox).applyMatrix4(meshes.contentorMesh.matrixWorld);
-    rodaBox.copy(meshes.rodaMesh.geometry.boundingBox).applyMatrix4(meshes.rodaMesh.matrixWorld);
+    boxes.ligacaoBox.copy(meshes.ligacaoMesh.geometry.boundingBox).applyMatrix4(meshes.ligacaoMesh.matrixWorld);
+    boxes.contentorBox.copy(meshes.contentorMesh.geometry.boundingBox).applyMatrix4(meshes.contentorMesh.matrixWorld);
+    boxes.rodaBox.copy(meshes.rodaMesh.geometry.boundingBox).applyMatrix4(meshes.rodaMesh.matrixWorld);
     reboqueRefs.reboque.x = state.x;
   }
 
   // y: Reboque 
   if (reboqueRefs.reboque) {
-    ligacaoBox.copy(meshes.ligacaoMesh.geometry.boundingBox).applyMatrix4(meshes.ligacaoMesh.matrixWorld);
-    contentorBox.copy(meshes.contentorMesh.geometry.boundingBox).applyMatrix4(meshes.contentorMesh.matrixWorld);
-    rodaBox.copy(meshes.rodaMesh.geometry.boundingBox).applyMatrix4(meshes.rodaMesh.matrixWorld);
+    boxes.ligacaoBox.copy(meshes.ligacaoMesh.geometry.boundingBox).applyMatrix4(meshes.ligacaoMesh.matrixWorld);
+    boxes.contentorBox.copy(meshes.contentorMesh.geometry.boundingBox).applyMatrix4(meshes.contentorMesh.matrixWorld);
+    boxes.rodaBox.copy(meshes.rodaMesh.geometry.boundingBox).applyMatrix4(meshes.rodaMesh.matrixWorld);
     reboqueRefs.reboque.y = state.y;
   }
   
@@ -568,7 +569,7 @@ function init() {
 /////////////////////
 function animate() {
   update();
-  hasCollisions();
+  checkCollisions();
   render();
   requestAnimationFrame(animate);
 }
