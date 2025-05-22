@@ -71,7 +71,8 @@ const bracoBox = new THREE.Box3();
 const escapeBox = new THREE.Box3();
 const abdomenBox = new THREE.Box3();
 const cinturaBaseBox = new THREE.Box3();
-const pernaBox = new THREE.Box3();
+const lowerPernaBox = new THREE.Box3();
+const coxaBox = new THREE.Box3();
 const wheelBox = new THREE.Box3();
 const peBox = new THREE.Box3();
 const ligacaoBox = new THREE.Box3();
@@ -325,8 +326,8 @@ function createRobot() {
     );
     meshes.coxaMesh = coxa;
     coxa.position.set(3 * side, -5, 0);
-    perna.add(coxa);
     coxa.geometry.computeBoundingBox();
+    perna.add(coxa);
 
     // Perna
     const lowerPerna = new THREE.Mesh(
@@ -335,8 +336,9 @@ function createRobot() {
     );
     meshes.lowerPernaMesh = lowerPerna;
     lowerPerna.position.set(3 * side, -15, 0);
-    perna.add(lowerPerna);
     lowerPerna.geometry.computeBoundingBox();
+    perna.add(lowerPerna);
+    
 
     // Rodas nas pernas (direita e esquerda)
     for (let side of [1, -1]) {
@@ -402,6 +404,7 @@ function createReboque() {
   contentor.position.set(0, 6, 0);
   contentor.geometry.computeBoundingBox();
   reboque.add(contentor);
+  meshes.contentorMesh = contentor;
 
   // Peça de ligação (barra)
   const ligacao = new THREE.Mesh(
@@ -411,6 +414,7 @@ function createReboque() {
   ligacao.position.set(-16, 2, 0);
   ligacao.geometry.computeBoundingBox();
   reboque.add(ligacao);
+  meshes.ligacaoMesh = ligacao;
 
   // Rodas (4)
   const rodaOffsets = [
@@ -419,7 +423,10 @@ function createReboque() {
     [8, -1, 8],  // trás direita
     [8, -1, -8], // trás esquerda
   ];
+
+  let iterator = 0;
   for (let [x, y, z] of rodaOffsets) {
+    
     const roda = new THREE.Mesh(
       new THREE.CylinderGeometry(2, 2, 2, 16),
       new THREE.MeshStandardMaterial({ color: 0x111111 })
@@ -429,6 +436,8 @@ function createReboque() {
     roda.position.set(x, y, z);
     roda.geometry.computeBoundingBox();
     reboque.add(roda);
+    meshes.rodaMesh = roda;
+    iterator ++;
   }
 
   // Rodar o reboque para ficar de frente para a camera frontal
@@ -457,10 +466,15 @@ function update() {
   // θ1: pés 
   for (const pe of robotRefs.pes) {
     pe.rotation.x = state.theta1;
-    //peBox.copy(geometry.boundingBox)
+    peBox.copy(meshes.peMesh.geometry.boundingBox).applyMatrix4(meshes.peMesh.matrixWorld);
+  }
+  if(meshes.ligacaoMesh){
+    ligacaoBox.copy(meshes.ligacaoMesh.geometry.boundingBox).applyMatrix4(meshes.ligacaoMesh.matrixWorld);
   }
   // θ2: pernas
   if (robotRefs.pernas) {
+    lowerPernaBox.copy(meshes.lowerPernaMesh.geometry.boundingBox).applyMatrix4(meshes.lowerPernaMesh.matrixWorld);
+    coxaBox.copy(meshes.coxaMesh.geometry.boundingBox).applyMatrix4(meshes.coxaMesh.matrixWorld);
     robotRefs.pernas[0].rotation.x = state.theta2;
     robotRefs.pernas[1].rotation.x = state.theta2;
   }
@@ -478,12 +492,12 @@ function update() {
   }
   // x: Reboque 
   if (reboqueRefs.reboque) {
-    reboqueRefs.reboque.x = state.x;
+    reboqueRefs.reboque.position.x = state.x;
   }
 
   // x: Reboque 
   if (reboqueRefs.reboque) {
-    reboqueRefs.reboque.y = state.y;
+    reboqueRefs.reboque.position.y = state.y;
   }
   
 }
