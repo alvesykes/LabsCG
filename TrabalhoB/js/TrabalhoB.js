@@ -488,15 +488,22 @@ function update() {
   }
   // θ3: cabeça 
   if (robotRefs.cabeca) {
+    cabecaBox.copy(meshes.cabecaBox.geometry.boundingBox).applyMatrix4(meshes.cabecaBox.matrixWorld);
     robotRefs.cabeca.rotation.x = state.theta3;
   }
   // x: Reboque 
   if (reboqueRefs.reboque) {
+    ligacaoBox.copy(meshes.ligacaoBox.geometry.boundingBox).applyMatrix4(meshes.ligacaoBox.matrixWorld);
+    contentorBox.copy(meshes.contentorBox.geometry.boundingBox).applyMatrix4(meshes.contentorBox.matrixWorld);
+    rodaBox.copy(meshes.rodaBox.geometry.boundingBox).applyMatrix4(meshes.rodaBox.matrixWorld);
     reboqueRefs.reboque.position.x = state.x;
   }
 
   // x: Reboque 
   if (reboqueRefs.reboque) {
+    ligacaoBox.copy(meshes.ligacaoBox.geometry.boundingBox).applyMatrix4(meshes.ligacaoBox.matrixWorld);
+    contentorBox.copy(meshes.contentorBox.geometry.boundingBox).applyMatrix4(meshes.contentorBox.matrixWorld);
+    rodaBox.copy(meshes.rodaBox.geometry.boundingBox).applyMatrix4(meshes.rodaBox.matrixWorld);
     reboqueRefs.reboque.position.y = state.y;
   }
   
