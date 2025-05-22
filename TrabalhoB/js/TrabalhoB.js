@@ -11,6 +11,7 @@ let camera, scene, renderer;
 let cameras = {};
 let wireframeMode = false;
 let camiao = false;
+let truckStartIndex = 14;
 
 const state = {
   theta1: 0, // pés
@@ -461,13 +462,27 @@ function createReboque() {
 /* CHECK COLLISIONS */
 //////////////////////
 function checkCollisions() {
+
+  const boxValues = Object.values(boxes);
+  const boxKeys = Object.keys(boxes);
+
   if (boxes.peBox.intersectsBox(boxes.ligacaoBox)) {
-    console.log("Collision detected between foot and trailer linkage!");
     handleTruckCollision();
   }
-  for(box_a in boxes){
-    for(box_b in boxes){
-      if (!(box_a == boxes.peBox && box_b == boxes.ligacaoBox) && !(box_b == boxes.peBox && box_a == boxes.ligacaoBox)){
+
+
+  for (let i = truckStartIndex; i < boxValues.length; i++) {
+    const truckBox = boxValues[i];
+    const truckKey = boxKeys[i];
+
+    for (let j = 0; j < boxValues.length; j++) {
+      if (j >= truckStartIndex) continue; // Skip other truck boxes
+
+      const otherBox = boxValues[j];
+      const otherKey = boxKeys[j];
+
+      if (truckBox.intersectsBox(otherBox) && !((otherBox === boxes.peBox && truckBox === boxes.ligacaoBox))) {
+        console.log(`Collision between ${truckKey} and ${otherKey}`);
         handleCollisions();
       }
     }
@@ -490,7 +505,9 @@ function handleTruckCollision(){
 ///////////////////////
 /* HANDLE COLLISIONS */
 ///////////////////////
-function handleCollisions() {}
+function handleCollisions() {
+  console.log("Colisão normal");
+}
 
 ////////////
 /* UPDATE */
