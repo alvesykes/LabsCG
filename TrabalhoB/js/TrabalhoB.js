@@ -481,7 +481,7 @@ function checkCollisions() {
       const otherBox = boxValues[j];
       const otherKey = boxKeys[j];
 
-      if (truckBox.intersectsBox(otherBox) && !((otherBox == boxes.peBox && truckBox == boxe.ligacaoBox))) {
+      if (truckBox.intersectsBox(otherBox) && !(otherBox == boxes.peBox && truckBox == boxes.ligacaoBox)) {
         handleCollisions();
       }
     }
