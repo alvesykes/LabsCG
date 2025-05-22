@@ -466,7 +466,7 @@ function checkCollisions() {
   const boxValues = Object.values(boxes);
   const boxKeys = Object.keys(boxes);
 
-  if (boxes.peBox.intersectsBox(boxes.ligacaoBox)) {
+  if (boxes.peBox.intersectsBox(boxes.ligacaoBox) && !boxes.peBox.isEmpty() && !boxes.ligacaoBox.isEmpty()) {
     handleTruckCollision();
   }
 
@@ -481,19 +481,22 @@ function checkCollisions() {
       const otherBox = boxValues[j];
       const otherKey = boxKeys[j];
 
-      if (truckBox.intersectsBox(otherBox) && !((otherBox === boxes.peBox && truckBox === boxes.ligacaoBox))) {
-        console.log(`Collision between ${truckKey} and ${otherKey}`);
+      if (truckBox.intersectsBox(otherBox) && !((otherBox == boxes.peBox && truckBox == boxe.ligacaoBox))) {
         handleCollisions();
       }
     }
   }
 }
 
+let counter = 0;
 ////////////////////////////////
 /* Special ollision where trailer fuses with the robot foot*/
 ////////////////////////////////
 function handleTruckCollision(){
-  camiao = true;
+  if (counter > 0){
+    camiao = true;
+  }
+  counter ++;
   const peCenter = new THREE.Vector3();
   const ligacaoCenter = new THREE.Vector3();
   boxes.peBox.getCenter(peCenter);
