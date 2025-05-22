@@ -36,6 +36,7 @@ const meshes = {
   antenaLMesh: null,
   superiorBracoMesh: null,
   escape1Mesh: null,
+  escape2Mesh: null,
   antebracoMesh: null,
   abdomenMesh: null,
   cinturaBaseMesh: null,
@@ -68,7 +69,8 @@ const cabecaBox = new THREE.Box3();
 const olhoBox = new THREE.Box3();
 const antenaBox = new THREE.Box3();
 const bracoBox = new THREE.Box3();
-const escapeBox = new THREE.Box3();
+const escape1Box = new THREE.Box3();
+const escape2Box = new THREE.Box3();
 const abdomenBox = new THREE.Box3();
 const cinturaBaseBox = new THREE.Box3();
 const lowerPernaBox = new THREE.Box3();
@@ -247,6 +249,7 @@ function createRobot() {
     const escape2 = escape1.clone();
     escape2.position.z = -3.5;
     braco.add(escape2);
+    meshes.escape2Mesh = escape2;
     escape1.geometry.computeBoundingBox();
     escape2.geometry.computeBoundingBox();
 
@@ -480,6 +483,9 @@ function update() {
   }
   // δ1: braços 
   if (robotRefs.bracos) {
+    bracoBox.copy(meshes.superiorBracoMesh.geometry.boundingBox).applyMatrix4(meshes.superiorBracoMesh.matrixWorld);
+    escape1Box.copy(meshes.escape1Mesh.geometry.boundingBox).applyMatrix4(meshes.escape1Mesh.matrixWorld);
+    escape2Box.copy(meshes.escape2Mesh.geometry.boundingBox).applyMatrix4(meshes.escape2Mesh.matrixWorld);
     robotRefs.bracos[0].position.x = state.delta1;  // direito
     robotRefs.bracos[1].position.x = -state.delta1; // esquerdo
     robotRefs.bracos[0].position.z = state.delta1;  // direito
