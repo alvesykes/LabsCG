@@ -465,6 +465,13 @@ function checkCollisions() {
     console.log("Collision detected between foot and trailer linkage!");
     handleTruckCollision();
   }
+  for(box_a in boxes){
+    for(box_b in boxes){
+      if (!(box_a == boxes.peBox && box_b == boxes.ligacaoBox) && !(box_b == boxes.peBox && box_a == boxes.ligacaoBox)){
+        handleCollisions();
+      }
+    }
+  }
 }
 
 ////////////////////////////////
