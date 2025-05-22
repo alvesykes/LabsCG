@@ -473,7 +473,7 @@ function handleTruckCollision(){
   camiao = true;
   const peCenter = new THREE.Vector3();
   const ligacaoCenter = new THREE.Vector3();
-  peBox.getCenter(peCenter);
+  boxes.peBox.getCenter(peCenter);
   ligacaoBox.getCenter(ligacaoCenter);
   const offset = new THREE.Vector3().subVectors(peCenter, ligacaoCenter);
   reboqueRefs.reboque.position.add(offset);
@@ -491,23 +491,23 @@ function update() {
   // θ1: pés 
   for (const pe of robotRefs.pes) {
     pe.rotation.x = state.theta1;
-    peBox.copy(meshes.peMesh.geometry.boundingBox).applyMatrix4(meshes.peMesh.matrixWorld);
+    boxes.peBox.copy(meshes.peMesh.geometry.boundingBox).applyMatrix4(meshes.peMesh.matrixWorld);
   }
   if(meshes.ligacaoMesh){
-    ligacaoBox.copy(meshes.ligacaoMesh.geometry.boundingBox).applyMatrix4(meshes.ligacaoMesh.matrixWorld);
+    boxes.ligacaoBox.copy(meshes.ligacaoMesh.geometry.boundingBox).applyMatrix4(meshes.ligacaoMesh.matrixWorld);
   }
   // θ2: pernas
   if (robotRefs.pernas) {
-    lowerPernaBox.copy(meshes.lowerPernaMesh.geometry.boundingBox).applyMatrix4(meshes.lowerPernaMesh.matrixWorld);
-    coxaBox.copy(meshes.coxaMesh.geometry.boundingBox).applyMatrix4(meshes.coxaMesh.matrixWorld);
+    boxes.lowerPernaBox.copy(meshes.lowerPernaMesh.geometry.boundingBox).applyMatrix4(meshes.lowerPernaMesh.matrixWorld);
+    boxes.coxaBox.copy(meshes.coxaMesh.geometry.boundingBox).applyMatrix4(meshes.coxaMesh.matrixWorld);
     robotRefs.pernas[0].rotation.x = state.theta2;
     robotRefs.pernas[1].rotation.x = state.theta2;
   }
   // δ1: braços 
   if (robotRefs.bracos) {
-    bracoBox.copy(meshes.superiorBracoMesh.geometry.boundingBox).applyMatrix4(meshes.superiorBracoMesh.matrixWorld);
-    escape1Box.copy(meshes.escape1Mesh.geometry.boundingBox).applyMatrix4(meshes.escape1Mesh.matrixWorld);
-    escape2Box.copy(meshes.escape2Mesh.geometry.boundingBox).applyMatrix4(meshes.escape2Mesh.matrixWorld);
+    boxes.bracoBox.copy(meshes.superiorBracoMesh.geometry.boundingBox).applyMatrix4(meshes.superiorBracoMesh.matrixWorld);
+    boxes.escape1Box.copy(meshes.escape1Mesh.geometry.boundingBox).applyMatrix4(meshes.escape1Mesh.matrixWorld);
+    boxes.escape2Box.copy(meshes.escape2Mesh.geometry.boundingBox).applyMatrix4(meshes.escape2Mesh.matrixWorld);
     robotRefs.bracos[0].position.x = state.delta1;  // direito
     robotRefs.bracos[1].position.x = -state.delta1; // esquerdo
     robotRefs.bracos[0].position.z = state.delta1;  // direito
