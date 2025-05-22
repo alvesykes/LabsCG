@@ -10,6 +10,7 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 let camera, scene, renderer;
 let cameras = {};
 let wireframeMode = false;
+let camiao = false;
 
 const state = {
   theta1: 0, // pés
@@ -62,22 +63,26 @@ let reboqueRefs = {
 }
 
 const keysPressed = {};
-const reboqueBox = new THREE.Box3();
-const troncoBox = new THREE.Box3();
-const cabecaBox = new THREE.Box3();
-const olhoBox = new THREE.Box3();
-const antenaBox = new THREE.Box3();
-const bracoBox = new THREE.Box3();
-const escapeBox = new THREE.Box3();
-const abdomenBox = new THREE.Box3();
-const cinturaBaseBox = new THREE.Box3();
-const lowerPernaBox = new THREE.Box3();
-const coxaBox = new THREE.Box3();
-const wheelBox = new THREE.Box3();
-const peBox = new THREE.Box3();
-const ligacaoBox = new THREE.Box3();
-const rodaBox = new THREE.Box3();
-const contentorBox = new THREE.Box3();
+
+
+const boxes = {
+  reboqueBox: new THREE.Box3(),
+  troncoBox: new THREE.Box3(),
+  cabecaBox: new THREE.Box3(),
+  olhoBox: new THREE.Box3(),
+  antenaBox: new THREE.Box3(),
+  bracoBox: new THREE.Box3(),
+  escapeBox: new THREE.Box3(),
+  abdomenBox: new THREE.Box3(),
+  cinturaBaseBox: new THREE.Box3(),
+  lowerPernaBox: new THREE.Box3(),
+  coxaBox: new THREE.Box3(),
+  wheelBox: new THREE.Box3(),
+  peBox: new THREE.Box3(),
+  ligacaoBox: new THREE.Box3(),
+  rodaBox: new THREE.Box3(),
+  contentorBox: new THREE.Box3(),
+};
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -452,7 +457,25 @@ function createReboque() {
 //////////////////////
 /* CHECK COLLISIONS */
 //////////////////////
-function checkCollisions() {}
+function checkCollisions() {
+  if (peBox.intersectsBox(ligacaoBox)) {
+    console.log("Collision detected between foot and trailer linkage!");
+    handleTruckCollision();
+  }
+}
+
+////////////////////////////////
+/* Special ollision where trailer fuses with the robot foot*/
+////////////////////////////////
+function handleTruckCollision(){
+  camiao = true;
+  const peCenter = new THREE.Vector3();
+  const ligacaoCenter = new THREE.Vector3();
+  peBox.getCenter(peCenter);
+  ligacaoBox.getCenter(ligacaoCenter);
+  const offset = new THREE.Vector3().subVectors(peCenter, ligacaoCenter);
+  reboqueRefs.reboque.position.add(offset);
+}
 
 ///////////////////////
 /* HANDLE COLLISIONS */
@@ -488,23 +511,23 @@ function update() {
   }
   // θ3: cabeça 
   if (robotRefs.cabeca) {
-    cabecaBox.copy(meshes.cabecaBox.geometry.boundingBox).applyMatrix4(meshes.cabecaBox.matrixWorld);
+    cabecaBox.copy(meshes.cabecaPrincipalMesh.geometry.boundingBox).applyMatrix4(meshes.cabecaPrincipalMesh.matrixWorld);
     robotRefs.cabeca.rotation.x = state.theta3;
   }
   // x: Reboque 
   if (reboqueRefs.reboque) {
-    ligacaoBox.copy(meshes.ligacaoBox.geometry.boundingBox).applyMatrix4(meshes.ligacaoBox.matrixWorld);
-    contentorBox.copy(meshes.contentorBox.geometry.boundingBox).applyMatrix4(meshes.contentorBox.matrixWorld);
-    rodaBox.copy(meshes.rodaBox.geometry.boundingBox).applyMatrix4(meshes.rodaBox.matrixWorld);
-    reboqueRefs.reboque.position.x = state.x;
+    ligacaoBox.copy(meshes.ligacaoMesh.geometry.boundingBox).applyMatrix4(meshes.ligacaoMesh.matrixWorld);
+    contentorBox.copy(meshes.contentorMesh.geometry.boundingBox).applyMatrix4(meshes.contentorMesh.matrixWorld);
+    rodaBox.copy(meshes.rodaMesh.geometry.boundingBox).applyMatrix4(meshes.rodaMesh.matrixWorld);
+    reboqueRefs.reboque.x = state.x;
   }
 
-  // x: Reboque 
+  // y: Reboque 
   if (reboqueRefs.reboque) {
-    ligacaoBox.copy(meshes.ligacaoBox.geometry.boundingBox).applyMatrix4(meshes.ligacaoBox.matrixWorld);
-    contentorBox.copy(meshes.contentorBox.geometry.boundingBox).applyMatrix4(meshes.contentorBox.matrixWorld);
-    rodaBox.copy(meshes.rodaBox.geometry.boundingBox).applyMatrix4(meshes.rodaBox.matrixWorld);
-    reboqueRefs.reboque.position.y = state.y;
+    ligacaoBox.copy(meshes.ligacaoMesh.geometry.boundingBox).applyMatrix4(meshes.ligacaoMesh.matrixWorld);
+    contentorBox.copy(meshes.contentorMesh.geometry.boundingBox).applyMatrix4(meshes.contentorMesh.matrixWorld);
+    rodaBox.copy(meshes.rodaMesh.geometry.boundingBox).applyMatrix4(meshes.rodaMesh.matrixWorld);
+    reboqueRefs.reboque.y = state.y;
   }
   
 }
@@ -531,11 +554,16 @@ function init() {
   window.addEventListener("resize", onResize);
 }
 
+
+
+
+
 /////////////////////
 /* ANIMATION CYCLE */
 /////////////////////
 function animate() {
   update();
+  hasCollisions();
   render();
   requestAnimationFrame(animate);
 }
@@ -628,16 +656,24 @@ function onKeyDown(e) {
       state.theta3 = Math.max(state.theta3 - speed.theta, limits.theta3.min);
       break;
     case "ArrowUp":
-      reboqueRefs.reboque.position.z -= 0.5;
+      if(camiao == false){
+        reboqueRefs.reboque.position.z -= 0.5;
+      }
       break;
     case "ArrowDown":
-      reboqueRefs.reboque.position.z += 0.5;
+      if(camiao == false){
+        reboqueRefs.reboque.position.z += 0.5;
+      }
       break;
     case "ArrowLeft":
-      reboqueRefs.reboque.position.x -= 0.5;
+      if(camiao == false){
+        reboqueRefs.reboque.position.x -= 0.5;
+      }  
       break;
     case "ArrowRight":
-      reboqueRefs.reboque.position.x += 0.5;
+      if(camiao == false){
+        reboqueRefs.reboque.position.x += 0.5;
+      }
       break;
     default:
       break;
@@ -658,4 +694,5 @@ animate();
 //To do: 
 // ver teclas ao mesmo tempo
 // por tudo como bracoL ou bracoE (sem trocar de pt para inglês)
+// colisão com o pé caso normal
 
