@@ -27,8 +27,8 @@ const limits = {
   theta3: { min: -Math.PI , max: 0},
 };
 const speed = {
-  theta: 0.02,
-  delta: 0.1,
+  theta: 0.01,
+  delta: 0.02,
 };
 const meshes = {
   troncoMesh: null,
@@ -332,15 +332,11 @@ function createRobot() {
   const cintura = createCintura();
   robot.add(cintura);
 
-  // Pivots para rodar as pernas
-  const pivotD = new THREE.Group();
-  const pivotE = new THREE.Group();
-  pivotD.position.set(0, -12, 0);
-  pivotE.position.set(0, -12, 0);
 
   // Coxas e pernas
   function createPerna(side = 1) {
     const perna = new THREE.Group();
+    perna.position.set(0, -12, 0);
 
     // Coxa
     const coxa = new THREE.Mesh(
@@ -405,11 +401,9 @@ function createRobot() {
 
   const pernaD = createPerna(1);  // Direita
   const pernaE = createPerna(-1); // Esquerda
-  pivotD.add(pernaD);
-  pivotE.add(pernaE);
-  robot.add(pivotD);
-  robot.add(pivotE);
-  robotRefs.pernas = [pivotD, pivotE];
+  robot.add(pernaD);
+  robot.add(pernaE);
+  robotRefs.pernas = [pernaD, pernaE];
 
   robot.position.y = 0;
   robotRefs.robot = robot;
@@ -538,6 +532,38 @@ function updateBoundingBoxes() {
 /* UPDATE */
 ////////////
 function update() {
+  // Atualizar graus de liberdade com base nas teclas pressionadas
+  if (!camiao) {
+    // θ1: pés
+    if (keysPressed["q"]) {
+      state.theta1 = Math.min(state.theta1 + speed.theta, limits.theta1.max);
+    }
+    if (keysPressed["a"]) {
+      state.theta1 = Math.max(state.theta1 - speed.theta, limits.theta1.min);
+    }
+    // θ2: pernas
+    if (keysPressed["w"]) {
+      state.theta2 = Math.min(state.theta2 + speed.theta, limits.theta2.max);
+    }
+    if (keysPressed["s"]) {
+      state.theta2 = Math.max(state.theta2 - speed.theta, limits.theta2.min);
+    }
+  }
+  // δ1: braços
+  if (keysPressed["e"]) {
+    state.delta1 = Math.min(state.delta1 + speed.delta, limits.delta1.max);
+  }
+  if (keysPressed["d"]) {
+    state.delta1 = Math.max(state.delta1 - speed.delta, limits.delta1.min);
+  }
+  // θ3: cabeça
+  if (keysPressed["r"]) {
+    state.theta3 = Math.min(state.theta3 + speed.theta, limits.theta3.max);
+  }
+  if (keysPressed["f"]) {
+    state.theta3 = Math.max(state.theta3 - speed.theta, limits.theta3.min);
+  }
+
   // θ1: pés 
   for (const pe of robotRefs.pes) {
     pe.rotation.x = state.theta1;
@@ -620,9 +646,6 @@ function init() {
 }
 
 
-
-
-
 /////////////////////
 /* ANIMATION CYCLE */
 /////////////////////
@@ -693,43 +716,7 @@ function onKeyDown(e) {
       }
       });
       break;
-    
-    // θ1: Q/A
-    case "q":
-      if(camiao == false){
-        state.theta1 = Math.min(state.theta1 + speed.theta, limits.theta1.max);
-      }
-      break;
-    case "a":
-      if(camiao == false){
-        state.theta1 = Math.max(state.theta1 - speed.theta, limits.theta1.min);
-      }
-      break;
-    // θ2: W/S
-    case "w":
-      if(camiao == false){
-        state.theta2 = Math.min(state.theta2 + speed.theta, limits.theta2.max);
-      }
-      break;
-    case "s":
-      if(camiao == false){
-        state.theta2 = Math.max(state.theta2 - speed.theta, limits.theta2.min);
-      }
-      break;
-    // δ1: E/D
-    case "e":
-      state.delta1 = Math.min(state.delta1 + speed.delta, limits.delta1.max);
-      break;
-    case "d":
-      state.delta1 = Math.max(state.delta1 - speed.delta, limits.delta1.min);
-      break;
-    // θ3: R/F
-    case "r":
-      state.theta3 = Math.min(state.theta3 + speed.theta, limits.theta3.max);
-      break;
-    case "f":
-      state.theta3 = Math.max(state.theta3 - speed.theta, limits.theta3.min);
-      break;
+
     default:
       break;
   }
