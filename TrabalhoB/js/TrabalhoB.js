@@ -57,6 +57,7 @@ let robotRefs = {
   bracos: [],
   cabeca: null,
   pernas: [],
+  robot: null,
 };
 
 let reboqueRefs = {
@@ -411,7 +412,7 @@ function createRobot() {
   robotRefs.pernas = [pivotD, pivotE];
 
   robot.position.y = 0;
-
+  robotRefs.robot = robot;
   scene.add(robot);
 }
 
@@ -519,11 +520,18 @@ function handleTruckCollision(){
   reboqueRefs.reboque.position.add(offset);
 }
 
-///////////////////////
-/* HANDLE COLLISIONS */
-///////////////////////
-function handleCollisions() {
+////////////
+/* UPDATE BOUNDING BOXES */
+////////////
+function updateBoundingBoxes() {
+  reboqueRefs.reboque.updateMatrixWorld(true);
+  meshes.ligacaoMesh.updateMatrixWorld(true);
+  meshes.contentorMesh.updateMatrixWorld(true);
+  meshes.rodaMesh.updateMatrixWorld(true);
 
+  boxes.ligacaoBox.copy(meshes.ligacaoMesh.geometry.boundingBox).applyMatrix4(meshes.ligacaoMesh.matrixWorld);
+  boxes.contentorBox.copy(meshes.contentorMesh.geometry.boundingBox).applyMatrix4(meshes.contentorMesh.matrixWorld);
+  boxes.rodaBox.copy(meshes.rodaMesh.geometry.boundingBox).applyMatrix4(meshes.rodaMesh.matrixWorld);
 }
 
 ////////////
@@ -561,33 +569,31 @@ function update() {
     boxes.cabecaBox.copy(meshes.cabecaPrincipalMesh.geometry.boundingBox).applyMatrix4(meshes.cabecaPrincipalMesh.matrixWorld);
     robotRefs.cabeca.rotation.x = state.theta3;
   }
-  // x: Reboque 
-  if (reboqueRefs.reboque) {
-    reboqueRefs.reboque.updateMatrixWorld(true); // força atualizar a matriz mundial
 
-    meshes.ligacaoMesh.updateMatrixWorld(true);
-    meshes.contentorMesh.updateMatrixWorld(true);
-    meshes.rodaMesh.updateMatrixWorld(true);
+  //Combinações de arrows
+  let moveX = 0;
+  let moveZ = 0;
+  if (keysPressed["arrowup"]) moveZ -= 0.2;
+  if (keysPressed["arrowdown"]) moveZ += 0.2;
+  if (keysPressed["arrowleft"]) moveX -= 0.2;
+  if (keysPressed["arrowright"]) moveX += 0.2;
 
-    boxes.ligacaoBox.copy(meshes.ligacaoMesh.geometry.boundingBox).applyMatrix4(meshes.ligacaoMesh.matrixWorld);
-    boxes.contentorBox.copy(meshes.contentorMesh.geometry.boundingBox).applyMatrix4(meshes.contentorMesh.matrixWorld);
-    boxes.rodaBox.copy(meshes.rodaMesh.geometry.boundingBox).applyMatrix4(meshes.rodaMesh.matrixWorld);
-    reboqueRefs.reboque.x = state.x;
+  if (moveX !== 0 || moveZ !== 0) {
+    if (!camiao) {
+      reboqueRefs.reboque.position.x += moveX;
+      reboqueRefs.reboque.position.z += moveZ;
+      updateBoundingBoxes();
+      checkCollisions();
+    } else {
+      reboqueRefs.reboque.position.x += moveX;
+      reboqueRefs.reboque.position.z += moveZ;
+      robotRefs.robot.position.x += moveX;
+      robotRefs.robot.position.z += moveZ;
+    }
   }
 
-  // y: Reboque 
-  if (reboqueRefs.reboque) {
-    reboqueRefs.reboque.updateMatrixWorld(true); 
-    meshes.ligacaoMesh.updateMatrixWorld(true);
-    meshes.contentorMesh.updateMatrixWorld(true);
-    meshes.rodaMesh.updateMatrixWorld(true);
+  updateBoundingBoxes();
 
-    boxes.ligacaoBox.copy(meshes.ligacaoMesh.geometry.boundingBox).applyMatrix4(meshes.ligacaoMesh.matrixWorld);
-    boxes.contentorBox.copy(meshes.contentorMesh.geometry.boundingBox).applyMatrix4(meshes.contentorMesh.matrixWorld);
-    boxes.rodaBox.copy(meshes.rodaMesh.geometry.boundingBox).applyMatrix4(meshes.rodaMesh.matrixWorld);
-    reboqueRefs.reboque.y = state.y;
-  }
-  
 }
 
 /////////////
@@ -609,6 +615,7 @@ function init() {
   createCameras();
 
   window.addEventListener("keydown", onKeyDown);
+  window.addEventListener("keyup", onKeyUp);
   window.addEventListener("resize", onResize);
 }
 
@@ -659,6 +666,7 @@ function onResize() {
 ///////////////////////
 function onKeyDown(e) {
   keysPressed[e.key.toLowerCase()] = true;
+  console.log(keysPressed);
   switch (e.key) {
     case "1":
       camera = cameras.frontal;
@@ -721,46 +729,6 @@ function onKeyDown(e) {
       break;
     case "f":
       state.theta3 = Math.max(state.theta3 - speed.theta, limits.theta3.min);
-      break;
-    case "ArrowUp":
-      if(camiao == false){
-        reboqueRefs.reboque.position.z -= 0.5;
-        update();
-      }
-      update();
-      if (checkCollisions()) {
-        reboqueRefs.reboque.position.z += 0.5; // desfaz o movimento
-      }
-      break;
-    case "ArrowDown":
-      if(camiao == false){
-        reboqueRefs.reboque.position.z += 0.5;
-        update();
-        if (checkCollisions()) {
-        reboqueRefs.reboque.position.z -= 0.5;
-        }
-      }
-      update();
-      
-      break;
-    case "ArrowLeft":
-      if(camiao == false){
-        reboqueRefs.reboque.position.x -= 0.5;
-        update();
-      }  
-      if (checkCollisions()) {
-        reboqueRefs.reboque.position.x += 0.5; 
-      }
-      break;
-    case "ArrowRight":
-      if(camiao == false){
-        reboqueRefs.reboque.position.x += 0.5;
-      }
-      update();
-      if (checkCollisions()) {
-        console.log("oi");
-        reboqueRefs.reboque.position.x -= 0.5; 
-      }
       break;
     default:
       break;
