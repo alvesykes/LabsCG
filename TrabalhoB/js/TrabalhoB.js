@@ -11,7 +11,6 @@ let camera, scene, renderer;
 let cameras = {};
 let wireframeMode = false;
 let camiao = false;
-let truckStartIndex = 14;
 
 const state = {
   theta1: 0, // pés
@@ -86,6 +85,20 @@ const boxes = {
   rodaBox: new THREE.Box3(),
   contentorBox: new THREE.Box3(),
 };
+
+const allowedCollisions = [
+  ["cabecaBox", "troncoBox"],
+  ["cabecaBox", "olhoBox"],
+  ["antenaBox", "cabecaBox"],
+  ["coxaBox", "lowerPernaBox"],
+  ["contentorBox", "ligacaoBox"],
+  ["contentorBox", "rodaBox"],
+  ["bracoBox", "escape1Box"],
+  ["bracoBox", "escape2Box"],
+  ["escape1Box", "escape2Box"],
+  ["lowerPernaBox", "peBox"],
+  ["abdomenBox", "troncoBox"]
+];
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -462,39 +475,40 @@ function createReboque() {
 /* CHECK COLLISIONS */
 //////////////////////
 function checkCollisions() {
-
-  const boxValues = Object.values(boxes);
-  const boxKeys = Object.keys(boxes);
-
-  if (boxes.peBox.intersectsBox(boxes.ligacaoBox) && !boxes.peBox.isEmpty() && !boxes.ligacaoBox.isEmpty()) {
+  let collisionDetected = false;
+  if (boxes.peBox.intersectsBox(boxes.ligacaoBox)) {
+    console.log("Collision detected between foot and trailer linkage!");
     handleTruckCollision();
+    collisionDetected = true;
   }
+  for (const [nameA, boxA] of Object.entries(boxes)) {
+    for (const [nameB, boxB] of Object.entries(boxes)) {
+      if (nameA === nameB) continue;
 
+      // Verifica se colisão é permitida
+      const pair = [nameA, nameB].sort(); // ordem alfabética
+      const isAllowed = allowedCollisions.some(
+        ([a, b]) => [a, b].sort().toString() === pair.toString()
+      );
+      if (isAllowed) continue;
 
-  for (let i = truckStartIndex; i < boxValues.length; i++) {
-    const truckBox = boxValues[i];
-    const truckKey = boxKeys[i];
-
-    for (let j = 0; j < boxValues.length; j++) {
-      if (j >= truckStartIndex) continue; // Skip other truck boxes
-
-      const otherBox = boxValues[j];
-      const otherKey = boxKeys[j];
-
-      if (truckBox.intersectsBox(otherBox) && !(otherBox == boxes.peBox && truckBox == boxes.ligacaoBox)) {
-        handleCollisions();
+      if (boxA.intersectsBox(boxB)) {
+        console.warn(`Colisão detectada entre ${nameA} e ${nameB}`);
+        collisionDetected = true;
       }
     }
   }
+  return collisionDetected;
 }
 
-let counter = 0;
+
 ////////////////////////////////
-/* Special ollision where trailer fuses with the robot foot*/
+/* Special collision where trailer fuses with the robot foot*/
 ////////////////////////////////
+let counter =0;
 function handleTruckCollision(){
   if (counter > 0){
-    camiao = true;
+  camiao = true;
   }
   counter ++;
   const peCenter = new THREE.Vector3();
@@ -509,7 +523,7 @@ function handleTruckCollision(){
 /* HANDLE COLLISIONS */
 ///////////////////////
 function handleCollisions() {
-  console.log("Colisão normal");
+
 }
 
 ////////////
@@ -549,6 +563,12 @@ function update() {
   }
   // x: Reboque 
   if (reboqueRefs.reboque) {
+    reboqueRefs.reboque.updateMatrixWorld(true); // força atualizar a matriz mundial
+
+    meshes.ligacaoMesh.updateMatrixWorld(true);
+    meshes.contentorMesh.updateMatrixWorld(true);
+    meshes.rodaMesh.updateMatrixWorld(true);
+
     boxes.ligacaoBox.copy(meshes.ligacaoMesh.geometry.boundingBox).applyMatrix4(meshes.ligacaoMesh.matrixWorld);
     boxes.contentorBox.copy(meshes.contentorMesh.geometry.boundingBox).applyMatrix4(meshes.contentorMesh.matrixWorld);
     boxes.rodaBox.copy(meshes.rodaMesh.geometry.boundingBox).applyMatrix4(meshes.rodaMesh.matrixWorld);
@@ -557,6 +577,11 @@ function update() {
 
   // y: Reboque 
   if (reboqueRefs.reboque) {
+    reboqueRefs.reboque.updateMatrixWorld(true); 
+    meshes.ligacaoMesh.updateMatrixWorld(true);
+    meshes.contentorMesh.updateMatrixWorld(true);
+    meshes.rodaMesh.updateMatrixWorld(true);
+
     boxes.ligacaoBox.copy(meshes.ligacaoMesh.geometry.boundingBox).applyMatrix4(meshes.ligacaoMesh.matrixWorld);
     boxes.contentorBox.copy(meshes.contentorMesh.geometry.boundingBox).applyMatrix4(meshes.contentorMesh.matrixWorld);
     boxes.rodaBox.copy(meshes.rodaMesh.geometry.boundingBox).applyMatrix4(meshes.rodaMesh.matrixWorld);
@@ -596,9 +621,10 @@ function init() {
 /////////////////////
 function animate() {
   update();
-  checkCollisions();
+  
   render();
   requestAnimationFrame(animate);
+  checkCollisions();
 }
 
 ////////////////////////////
@@ -691,21 +717,41 @@ function onKeyDown(e) {
     case "ArrowUp":
       if(camiao == false){
         reboqueRefs.reboque.position.z -= 0.5;
+        update();
+      }
+      update();
+      if (checkCollisions()) {
+        reboqueRefs.reboque.position.z += 0.5; // desfaz o movimento
       }
       break;
     case "ArrowDown":
       if(camiao == false){
         reboqueRefs.reboque.position.z += 0.5;
+        update();
+        if (checkCollisions()) {
+        reboqueRefs.reboque.position.z -= 0.5;
+        }
       }
+      update();
+      
       break;
     case "ArrowLeft":
       if(camiao == false){
         reboqueRefs.reboque.position.x -= 0.5;
+        update();
       }  
+      if (checkCollisions()) {
+        reboqueRefs.reboque.position.x += 0.5; 
+      }
       break;
     case "ArrowRight":
       if(camiao == false){
         reboqueRefs.reboque.position.x += 0.5;
+      }
+      update();
+      if (checkCollisions()) {
+        console.log("oi");
+        reboqueRefs.reboque.position.x -= 0.5; 
       }
       break;
     default:
