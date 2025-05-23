@@ -688,17 +688,25 @@ function onKeyDown(e) {
     
     // θ1: Q/A
     case "q":
-      state.theta1 = Math.min(state.theta1 + speed.theta, limits.theta1.max);
+      if(camiao == false){
+        state.theta1 = Math.min(state.theta1 + speed.theta, limits.theta1.max);
+      }
       break;
     case "a":
-      state.theta1 = Math.max(state.theta1 - speed.theta, limits.theta1.min);
+      if(camiao == false){
+        state.theta1 = Math.max(state.theta1 - speed.theta, limits.theta1.min);
+      }
       break;
     // θ2: W/S
     case "w":
-      state.theta2 = Math.min(state.theta2 + speed.theta, limits.theta2.max);
+      if(camiao == false){
+        state.theta2 = Math.min(state.theta2 + speed.theta, limits.theta2.max);
+      }
       break;
     case "s":
-      state.theta2 = Math.max(state.theta2 - speed.theta, limits.theta2.min);
+      if(camiao == false){
+        state.theta2 = Math.max(state.theta2 - speed.theta, limits.theta2.min);
+      }
       break;
     // δ1: E/D
     case "e":
@@ -770,8 +778,5 @@ function onKeyUp(e) {
 init();
 animate();
 
-//To do: 
-// ver teclas ao mesmo tempo
-// por tudo como bracoL ou bracoE (sem trocar de pt para inglês)
-// colisão com o pé caso normal
+
 
