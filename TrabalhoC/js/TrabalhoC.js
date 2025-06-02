@@ -59,10 +59,10 @@ function gerarTexturaCampoFloral() {
   canvas.height = 512;
   const ctx = canvas.getContext('2d');
 
-  ctx.fillStyle = '#77ee77';
+  ctx.fillStyle = '#88dd55';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const coresFlores = ['white', 'yellow', 'violet', 'lightblue'];
+  const coresFlores = ['white', 'yellow', 'violet', '#69daff'];
   for (let i = 0; i < 700; i++) {
     ctx.beginPath();
     ctx.fillStyle = coresFlores[Math.floor(Math.random() * coresFlores.length)];
@@ -109,7 +109,7 @@ function createPlaneWithTexture(texture) {
         plane.material.dispose();
     }
 
-    const geometry = new THREE.PlaneGeometry(50, 50);
+    const geometry = new THREE.PlaneGeometry(110, 110);
     const material = new THREE.MeshStandardMaterial({ map: texture, side: THREE.DoubleSide });
     plane = new THREE.Mesh(geometry, material);
     plane.rotation.x = -Math.PI / 2; 
@@ -117,59 +117,65 @@ function createPlaneWithTexture(texture) {
 }
 
 function createPlaneWithHeightmap(url, textura) {
-  const loader = new THREE.TextureLoader();
+    if (plane) {
+            scene.remove(plane);
+            plane.geometry.dispose();
+            plane.material.map.dispose();
+            plane.material.dispose();
+        }
+    const loader = new THREE.TextureLoader();
 
-  loader.load(url, (heightmapTexture) => {
-    const geometry = new THREE.PlaneGeometry(100, 100, 100, 100);
-    const material = new THREE.MeshLambertMaterial({ map: textura });
-    plane = new THREE.Mesh(geometry, material);
-    plane.rotation.x = -Math.PI / 2;
+    loader.load(url, (heightmapTexture) => {
+        const geometry = new THREE.PlaneGeometry(100, 100, 100, 100);
+        const material = new THREE.MeshLambertMaterial({ map: textura });
+        plane = new THREE.Mesh(geometry, material);
+        plane.rotation.x = -Math.PI / 2;
 
-    const image = heightmapTexture.image;
+        const image = heightmapTexture.image;
 
-    const canvas = document.createElement('canvas');
-    canvas.width = image.width;
-    canvas.height = image.height;
+        const canvas = document.createElement('canvas');
+        canvas.width = image.width;
+        canvas.height = image.height;
 
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(image, 0, 0);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(image, 0, 0);
 
-    const imgData = ctx.getImageData(0, 0, image.width, image.height).data;
+        const imgData = ctx.getImageData(0, 0, image.width, image.height).data;
 
-    const vertices = geometry.attributes.position;
-    const vertexCount = vertices.count;
+        const vertices = geometry.attributes.position;
+        const vertexCount = vertices.count;
 
-    for (let i = 0; i < vertexCount; i++) {
-      const x = i % image.width;
-      const y = Math.floor(i / image.width);
+        for (let i = 0; i < vertexCount; i++) {
+        const x = i % image.width;
+        const y = Math.floor(i / image.width);
 
-      const index = (y * image.width + x) * 4;
-      const altura = imgData[index]; 
-      const alturaNormalizada = (altura / 255) * 10;
+        const index = (y * image.width + x) * 4;
+        const altura = imgData[index]; 
+        const alturaNormalizada = (altura / 255) * 10;
 
-      vertices.setZ(i, alturaNormalizada);
-    }
+        vertices.setZ(i, alturaNormalizada);
+        }
 
-    vertices.needsUpdate = true;
-    geometry.computeVertexNormals();
+        vertices.needsUpdate = true;
+        geometry.computeVertexNormals();
 
-    scene.add(plane);
-  }, undefined, (err) => {
-    console.error("Erro ao carregar heightmap:", err);
-  });
+        scene.add(plane);
+    }, undefined, (err) => {
+        console.error("Erro ao carregar heightmap:", err);
+    });
 }
 
 function createSkydome() {
-  const texturaCeu = gerarTexturaCeuEstrelado();
+    const texturaCeu = gerarTexturaCeuEstrelado();
 
-  const geometria = new THREE.SphereGeometry(50, 64, 64, 0, Math.PI * 2, 0, Math.PI / 2); 
-  const material = new THREE.MeshStandardMaterial({
-    map: texturaCeu,
-    side: THREE.BackSide 
-  });
+    const geometria = new THREE.SphereGeometry(50, 64, 64, 0, Math.PI * 2, 0, Math.PI / 2); 
+    const material = new THREE.MeshStandardMaterial({
+        map: texturaCeu,
+        side: THREE.BackSide 
+    });
 
-  const skydome = new THREE.Mesh(geometria, material);
-  scene.add(skydome);
+    const skydome = new THREE.Mesh(geometria, material);
+    scene.add(skydome);
 }
 
 
@@ -252,6 +258,10 @@ function onKeyDown(e) {
     else if (e.key === '2') {
         const textura = gerarTexturaCeuEstrelado();
         createPlaneWithTexture(textura);
+    }
+    else if (e.key === '3') {
+        const textura = gerarTexturaCampoFloral();
+        createPlaneWithHeightmap("heightmap.png", textura);
     }
     else if (e.key === 'd' || e.key === "D") {
         if (lightOn) {
