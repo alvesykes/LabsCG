@@ -7,7 +7,8 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 //////////////////////
 /* GLOBAL VARIABLES */
 //////////////////////
-let camera, scene, renderer, plane;
+let camera, scene, renderer, plane, directionalLight
+let lightOn = true;
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -21,6 +22,7 @@ function createScene() {
     createLight();
     const textura0 = gerarTexturaCampoFloral();
     //createPlaneWithTexture(textura0);
+    createMoon();
     createPlaneWithHeightmap("heightmap.png", textura0);
     createSkydome();
 }
@@ -42,11 +44,9 @@ function createCamera() {
 /* CREATE LIGHT(S) */
 /////////////////////
 function createLight() {
-  const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-  scene.add(ambientLight);
-
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1.3);
-  directionalLight.position.set(30, 50, 50);
+ 
+  directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  directionalLight.position.set(0, 40, 20);
   scene.add(directionalLight);
 }
 
@@ -173,6 +173,17 @@ function createSkydome() {
 }
 
 
+function createMoon(){
+
+    const moon = new THREE.Mesh(
+        new THREE.SphereGeometry(3),
+        new THREE.MeshStandardMaterial({ color: 0xd3d3d3, metalness: 0.5, roughness: 0.5 })
+      );
+    moon.position.set(0, 40, 20);
+    scene.add(moon);
+}
+
+
 //////////////////////
 /* CHECK COLLISIONS */
 //////////////////////
@@ -242,6 +253,16 @@ function onKeyDown(e) {
         const textura = gerarTexturaCeuEstrelado();
         createPlaneWithTexture(textura);
     }
+    else if (e.key === 'd' || e.key === "D") {
+        if (lightOn) {
+            directionalLight.visible = false;  
+            lightOn = false;
+        } else { 
+            directionalLight.visible = true;
+            lightOn = true;
+        }
+    }
+    
 }
 
 
