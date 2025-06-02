@@ -7,8 +7,10 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 //////////////////////
 /* GLOBAL VARIABLES */
 //////////////////////
-let camera, scene, renderer, plane, directionalLight
+let camera, scene, renderer, plane, directionalLight;
 let lightOn = true;
+// Adiciona variáveis para câmara fixa e estereoscópica
+let fixedCamera, stereoCamera;
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -25,6 +27,9 @@ function createScene() {
     createMoon();
     createPlaneWithHeightmap("heightmap.png", textura0);
     createSkydome();
+
+    // Adiciona a casa alentejana
+    createAlentejoHouse();
 }
 
 //////////////////////
@@ -32,12 +37,18 @@ function createScene() {
 //////////////////////
 function createCamera() {
   const aspect = window.innerWidth / window.innerHeight;
-  const frustumSize = 80;
-
   camera = new THREE.PerspectiveCamera(70, aspect, 1, 1000);
   camera.position.set(50, 50, 50);
   camera.lookAt(0, 0, 0);
 
+  // Câmara fixa com vista geral
+  fixedCamera = new THREE.PerspectiveCamera(70, aspect, 1, 1000);
+  fixedCamera.position.set(80, 60, 80);
+  fixedCamera.lookAt(0, 0, 0);
+
+  // StereoCamera para VR
+  stereoCamera = new THREE.StereoCamera();
+  stereoCamera.aspect = aspect;
 }
 
 /////////////////////
@@ -190,6 +201,63 @@ function createMoon(){
 }
 
 
+function createAlentejoHouse() {
+    const house = new THREE.Group();
+    house.position.set(0, 5, 0);
+
+    // Paredes principais (brancas)
+    const wallMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const walls = new THREE.Mesh(
+        new THREE.BoxGeometry(18, 7, 8),
+        wallMaterial
+    );
+    walls.position.y = 3;
+    house.add(walls);
+
+    
+    // Porta (azul)
+    const doorMaterial = new THREE.MeshLambertMaterial({ color: 0x0074d9 });
+    const door = new THREE.Mesh(
+        new THREE.BoxGeometry(2, 2.5, 0.2),
+        doorMaterial
+    );
+    door.position.set(0, 1.25, 4.11);
+    house.add(door);
+
+    // Janelas (azul) - duas à frente
+    const windowMaterial = new THREE.MeshLambertMaterial({ color: 0x0074d9 });
+    const window1 = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 1, 0.2),
+        windowMaterial
+    );
+    window1.position.set(-3, 3.5, 4.11);
+    house.add(window1);
+
+    const window2 = window1.clone();
+    window2.position.set(3, 3.5, 4.11);
+    house.add(window2);
+
+    // Telhado (laranja, prisma triangular)
+    const roofGeometry = new THREE.BufferGeometry();
+    const vertices = new Float32Array([
+        // base
+        -6, 6, -4,   6, 6, -4,   6, 6, 4,
+        -6, 6, -4,   6, 6, 4,   -6, 6, 4,
+        // lados
+        -6, 6, -4,   0, 9, 0,   6, 6, -4,
+        6, 6, -4,    0, 9, 0,   6, 6, 4,
+        6, 6, 4,     0, 9, 0,   -6, 6, 4,
+        -6, 6, 4,    0, 9, 0,   -6, 6, -4,
+    ]);
+    roofGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    roofGeometry.computeVertexNormals();
+    const roofMaterial = new THREE.MeshLambertMaterial({ color: 0xff6600 });
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    house.add(roof);
+
+    scene.add(house);
+}
+
 //////////////////////
 /* CHECK COLLISIONS */
 //////////////////////
@@ -209,7 +277,12 @@ function update() {}
 /* DISPLAY */
 /////////////
 function render() {
-    renderer.render(scene, camera);
+    // Renderização normal ou VR
+    if (renderer.xr.isPresenting) {
+        renderer.render(scene, camera);
+    } else {
+        renderer.render(scene, camera);
+    }
 }
 
 ////////////////////////////////
@@ -219,6 +292,10 @@ function init() {
   renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
+
+  // Ativa VR e adiciona VRButton
+  renderer.xr.enabled = true;
+  document.body.appendChild(VRButton.createButton(renderer));
 
   createScene();
   createCamera();
@@ -244,6 +321,8 @@ function animate() {
 function onResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+    fixedCamera.aspect = window.innerWidth / window.innerHeight;
+    fixedCamera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
@@ -272,7 +351,10 @@ function onKeyDown(e) {
             lightOn = true;
         }
     }
-    
+    else if (e.key === '7') {
+        // Alterna para a câmara fixa
+        camera = fixedCamera;
+    }
 }
 
 
