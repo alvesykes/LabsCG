@@ -204,63 +204,176 @@ function createMoon(){
     scene.add(moon);
 }
 
-
 function createAlentejoHouse() {
     const house = new THREE.Group();
-    house.position.set(0, 5, 0);
+    house.position.set(0, 3, 4);
 
     // Paredes principais (brancas)
     const wallMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
     const walls = new THREE.Mesh(
-        new THREE.BoxGeometry(18, 7, 8),
+        new THREE.BoxGeometry(18, 4.5, 8),
         wallMaterial
     );
     walls.position.y = 3;
     house.add(walls);
 
-    
+    // Faixa azul em rodapé (base da casa)
+    const faixaMaterial = new THREE.MeshLambertMaterial({ color: 0x0074d9 });
+    const faixa = new THREE.Mesh(
+        new THREE.BoxGeometry(18.05, 0.5, 8.05),
+        faixaMaterial
+    );
+    faixa.position.y = 1; // junto ao chão
+    house.add(faixa);
+
     // Porta (azul)
     const doorMaterial = new THREE.MeshLambertMaterial({ color: 0x0074d9 });
     const door = new THREE.Mesh(
-        new THREE.BoxGeometry(2, 2.5, 0.2),
+        new THREE.BoxGeometry(1.5, 3.5, 0.2),
         doorMaterial
     );
-    door.position.set(0, 1.25, 4.11);
+    door.position.set(-1.75, 2.5, 4);
     house.add(door);
 
     // Janelas (azul) - duas à frente
     const windowMaterial = new THREE.MeshLambertMaterial({ color: 0x0074d9 });
     const window1 = new THREE.Mesh(
-        new THREE.BoxGeometry(1, 1, 0.2),
+        new THREE.BoxGeometry(2, 2, 0.2),
         windowMaterial
     );
-    window1.position.set(-3, 3.5, 4.11);
+
+    window1.position.set(-6.5, 3.25, 4);
     house.add(window1);
 
     const window2 = window1.clone();
-    window2.position.set(3, 3.5, 4.11);
+    window2.position.set(-4, 3.25, 4);
     house.add(window2);
 
-    // Telhado (laranja, prisma triangular)
+    const window3 = window1.clone();
+    window3.position.set(2, 3.25, 4);
+    house.add(window3);
+
+    const window4 = window1.clone();
+    window4.position.set(6.5, 3.25, 4);
+    house.add(window4);
+
+    const window5 = window1.clone();
+    window5.position.set(9, 3.25, 0); 
+    window5.rotation.y = -Math.PI / 2; 
+    house.add(window5);
+
+    // Telhado com altura de 2 e junto às paredes
     const roofGeometry = new THREE.BufferGeometry();
     const vertices = new Float32Array([
-        // base
-        -6, 6, -4,   6, 6, -4,   6, 6, 4,
-        -6, 6, -4,   6, 6, 4,   -6, 6, 4,
-        // lados
-        -6, 6, -4,   0, 9, 0,   6, 6, -4,
-        6, 6, -4,    0, 9, 0,   6, 6, 4,
-        6, 6, 4,     0, 9, 0,   -6, 6, 4,
-        -6, 6, 4,    0, 9, 0,   -6, 6, -4,
+        // Base do telhado (em cima das paredes)
+        -9, 7, -4,   // 0: canto esquerdo-trás
+         9, 7, -4,   // 1: canto direito-trás
+         9, 7,  4,   // 2: canto direito-frente
+        -9, 7,  4,   // 3: canto esquerdo-frente
+        // Topo esquerdo (meio da lateral esquerda)
+        -9, 9, 0,    // 4: topo lateral esquerda (altura 7+2=9)
+        // Topo direito (meio da lateral direita)
+         9, 9, 0     // 5: topo lateral direita (altura 7+2=9)
     ]);
+    // Faces: duas laterais triangulares, frente e trás retangulares
+    const indices = [
+        // Lateral esquerda (triângulo)
+        0, 3, 4,
+        // Lateral direita (triângulo)
+        1, 2, 5,
+        // Frente (retângulo)
+        3, 2, 5,
+        3, 5, 4,
+        // Trás (retângulo)
+        0, 1, 5,
+        0, 5, 4,
+        // Fundo do telhado (base inferior, para garantir que as laterais fiquem visíveis)
+        0, 1, 2,
+        0, 2, 3
+    ];
     roofGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    roofGeometry.setIndex(indices);
     roofGeometry.computeVertexNormals();
-    const roofMaterial = new THREE.MeshLambertMaterial({ color: 0xff6600 });
+
+    const roofMaterial = new THREE.MeshLambertMaterial({ color: 0xff6600, side: THREE.DoubleSide });
     const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.y = -1.75; 
     house.add(roof);
+
+
+    const chimney = new THREE.Mesh(
+        new THREE.BoxGeometry(2.5, 2.5, 1),
+        new THREE.MeshLambertMaterial({ color: 0xffffff })
+    );
+
+    const chimneyLeft = chimney.clone();
+    chimneyLeft.position.set(-4.25, 6.5, -3.5);
+    house.add(chimneyLeft);
+
+    const chimneyRight = chimney.clone();
+    chimneyRight.position.set(4.25, 6.5, 3.5);
+    house.add(chimneyRight);
+
+    const pilares = new THREE.Group();
+    const pilarRectangle = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 4, 0.5),
+        new THREE.MeshLambertMaterial({ color: 0xffffff }) 
+    );
+
+    const pilarRectangle1 = pilarRectangle.clone();
+    pilarRectangle1.position.set(8.5, 2.75, 4.25);
+    const pilarRectangle2 = pilarRectangle.clone();
+    pilarRectangle2.position.set(-8.5, 2.75, 4.25);
+    const pilarRectangle3 = pilarRectangle.clone();
+    pilarRectangle3.position.set(0, 2.75, 4.25);
+    const pilarRectangle4 = pilarRectangle.clone();
+    pilarRectangle4.position.set(0, 2.75, -4.25);
+    const pilarRectangle5 = pilarRectangle.clone();
+    pilarRectangle5.position.set(8.5, 2.75, -4.25);
+    const pilarRectangle6 = pilarRectangle.clone();
+    pilarRectangle6.position.set(-8.5, 2.75, -4.25);
+
+    pilares.add(pilarRectangle1);
+    pilares.add(pilarRectangle2);
+    pilares.add(pilarRectangle3);
+    pilares.add(pilarRectangle4);
+    pilares.add(pilarRectangle5);
+    pilares.add(pilarRectangle6);
+
+    const pilarRamp = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 5, 5),
+        new THREE.MeshLambertMaterial({ color: 0xffffff })
+    );
+
+    const pilarRamp1 = pilarRamp.clone();
+    pilarRamp1.position.set(8.5, 1.5, 3);
+    pilarRamp1.rotation.x = - Math.PI / 10; 
+    const pilarRamp2 = pilarRamp.clone();
+    pilarRamp2.position.set(-8.5, 1.5, 3);
+    pilarRamp2.rotation.x = - Math.PI / 10;
+    const pilarRamp3 = pilarRamp.clone();
+    pilarRamp3.position.set(0, 1.5, 3);
+    pilarRamp3.rotation.x = - Math.PI / 10;
+    const pilarRamp4 = pilarRamp.clone();
+    pilarRamp4.position.set(0, 1.5, -3);
+    pilarRamp4.rotation.x = Math.PI / 10;
+    const pilarRamp5 = pilarRamp.clone();
+    pilarRamp5.position.set(8.5, 1.5, -3);
+    pilarRamp5.rotation.x = Math.PI / 10;
+    const pilarRamp6 = pilarRamp.clone();
+    pilarRamp6.position.set(-8.5, 1.5, -3);
+    pilarRamp6.rotation.x = Math.PI / 10;
+    pilares.add(pilarRamp1);
+    pilares.add(pilarRamp2);
+    pilares.add(pilarRamp3);
+    pilares.add(pilarRamp4);
+    pilares.add(pilarRamp5);
+    pilares.add(pilarRamp6);
+    house.add(pilares);
 
     scene.add(house);
 }
+
 function createOvni(){
     ovni = new THREE.Group();
 
