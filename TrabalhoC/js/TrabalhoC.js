@@ -7,10 +7,12 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 //////////////////////
 /* GLOBAL VARIABLES */
 //////////////////////
-let camera, scene, renderer, plane, directionalLight;
+let camera, scene, renderer, plane, textura, directionalLight;
 let lightOn = true;
 // Adiciona variáveis para câmara fixa e estereoscópica
 let fixedCamera, stereoCamera;
+let ovni, spotlight, luzes = [], spotlightOn = true, luzesAtivas = true;
+const keysPressed = {};
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -30,6 +32,7 @@ function createScene() {
 
     // Adiciona a casa alentejana
     createAlentejoHouse();
+    createOvni();
 }
 
 //////////////////////
@@ -38,8 +41,8 @@ function createScene() {
 function createCamera() {
   const aspect = window.innerWidth / window.innerHeight;
   camera = new THREE.PerspectiveCamera(70, aspect, 1, 1000);
-  camera.position.set(50, 50, 50);
-  camera.lookAt(0, 0, 0);
+  camera.position.set(45, 30, 45);
+  camera.lookAt(0, 15, 0); 
 
   // Câmara fixa com vista geral
   fixedCamera = new THREE.PerspectiveCamera(70, aspect, 1, 1000);
@@ -55,10 +58,11 @@ function createCamera() {
 /* CREATE LIGHT(S) */
 /////////////////////
 function createLight() {
- 
-  directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
-  directionalLight.position.set(0, 40, 20);
-  scene.add(directionalLight);
+    //Luz da lua
+    directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    directionalLight.position.set(0, 40, 20);
+    scene.add(directionalLight);
+
 }
 
 ////////////////////////
@@ -257,6 +261,58 @@ function createAlentejoHouse() {
 
     scene.add(house);
 }
+function createOvni(){
+    ovni = new THREE.Group();
+
+    const corpoGeometry = new THREE.SphereGeometry(3, 32, 32);
+    corpoGeometry.scale(1, 0.4, 1);
+    const corpoMaterial = new THREE.MeshStandardMaterial({ color: 0x88ffaa});
+    const corpoMesh = new THREE.Mesh(corpoGeometry, corpoMaterial);
+    ovni.add(corpoMesh);
+
+    const cockpitGeometry = new THREE.SphereGeometry(1.5, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2);
+    const cockpitMaterial = new THREE.MeshStandardMaterial({ color: 0x44ffff, transparent: true, opacity: 0.6 });
+    const cockpitMesh = new THREE.Mesh(cockpitGeometry, cockpitMaterial);
+    cockpitMesh.position.y = 1;
+    ovni.add(cockpitMesh);
+
+    const cilindro = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.8, 0.8, 0.2, 32),
+        new THREE.MeshStandardMaterial({ color: 0x444444 })
+    );
+    cilindro.position.y = -1.2;
+    ovni.add(cilindro);
+
+    spotlight = new THREE.SpotLight(0xffffff, 30, 0, 0.56);
+    spotlight.position.set(0, -1.2, 0);
+    spotlight.target.position.set(0, -3, 0);
+    ovni.add(spotlight);
+    ovni.add(spotlight.target);
+
+    for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * 2 * Math.PI;
+        const x = Math.cos(angle) * 2.5;
+        const z = Math.sin(angle) * 2.5;
+
+        const esfera = new THREE.Mesh(
+        new THREE.SphereGeometry(0.2, 16, 16),
+        new THREE.MeshStandardMaterial({ color: 0xffffaa })
+        );
+        esfera.position.set(x, -0.7, z);
+        ovni.add(esfera);
+
+        const luz = new THREE.PointLight(0xffffaa, 1, 5);
+        const lx = Math.cos(angle) * (2.8);
+        const lz = Math.sin(angle) * (2.8);
+        luz.position.set(lx, -0.8, lz);
+        ovni.add(luz);
+        luzes.push(luz);
+    }
+    
+    ovni.position.y = 20;
+    ovni.position.x = 20;
+    scene.add(ovni);
+}
 
 //////////////////////
 /* CHECK COLLISIONS */
@@ -271,7 +327,19 @@ function handleCollisions() {}
 ////////////
 /* UPDATE */
 ////////////
-function update() {}
+function update() {
+    if (ovni) {
+        // Rodar sobre o eixo
+        ovni.rotation.y += 0.01;
+
+        // Movimento horizontal com setas
+        const speed = 0.1;
+        if (keysPressed['arrowup']) ovni.position.z -= speed;
+        if (keysPressed['arrowdown']) ovni.position.z += speed;
+        if (keysPressed['arrowleft']) ovni.position.x -= speed;
+        if (keysPressed['arrowright']) ovni.position.x += speed;
+    }
+}
 
 /////////////
 /* DISPLAY */
@@ -330,30 +398,43 @@ function onResize() {
 /* KEY DOWN CALLBACK */
 ///////////////////////
 function onKeyDown(e) { 
-    if (e.key === '1') {
-        const textura = gerarTexturaCampoFloral();
-        createPlaneWithTexture(textura);
-    } 
-    else if (e.key === '2') {
-        const textura = gerarTexturaCeuEstrelado();
-        createPlaneWithTexture(textura);
-    }
-    else if (e.key === '3') {
-        const textura = gerarTexturaCampoFloral();
-        createPlaneWithHeightmap("heightmap.png", textura);
-    }
-    else if (e.key === 'd' || e.key === "D") {
-        if (lightOn) {
-            directionalLight.visible = false;  
-            lightOn = false;
-        } else { 
-            directionalLight.visible = true;
-            lightOn = true;
-        }
-    }
-    else if (e.key === '7') {
-        // Alterna para a câmara fixa
-        camera = fixedCamera;
+    keysPressed[e.key.toLowerCase()] = true;
+    switch (e.key){
+
+    
+        case '1':
+            textura = gerarTexturaCampoFloral();
+            createPlaneWithTexture(textura);
+            break;
+        case '2':
+            textura = gerarTexturaCeuEstrelado();
+            createPlaneWithTexture(textura);
+            break;
+        case '3':
+            textura = gerarTexturaCampoFloral();
+            createPlaneWithHeightmap("heightmap.png", textura);
+            break;
+        case 'd' :
+            if (lightOn) {
+                directionalLight.visible = false;  
+                lightOn = false;
+            } else { 
+                directionalLight.visible = true;
+                lightOn = true;
+            }
+            break;
+        case 'p':
+            luzesAtivas = !luzesAtivas;
+            luzes.forEach(l => l.visible = luzesAtivas);
+            break;
+        case 's':
+            spotlightOn = !spotlightOn;
+            spotlight.visible = spotlightOn;
+            break;
+        case '7':
+            // Alterna para a câmara fixa
+            camera = fixedCamera;
+            break;
     }
 }
 
@@ -362,7 +443,9 @@ function onKeyDown(e) {
 ///////////////////////
 /* KEY UP CALLBACK */
 ///////////////////////
-function onKeyUp(e) {}
+function onKeyUp(e) {
+    keysPressed[e.key.toLowerCase()] = false;
+}
 
 init();
 animate();
