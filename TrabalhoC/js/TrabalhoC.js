@@ -54,10 +54,7 @@ function createCamera() {
 /* CREATE LIGHT(S) */
 /////////////////////
 function createLight() {
-    ambientLight = new THREE.AmbientLight(0xffffff,0.5);
-    directionalLight = new THREE.DirectionalLight(0xffffff, 1.2); //Luz da lua
-    directionalLight.position.set(0, 40, 20);
-    scene.add(directionalLight);
+    ambientLight = new THREE.AmbientLight(0xffffff,0.3);
     scene.add(ambientLight);
 }
 
@@ -89,22 +86,22 @@ function gerarTexturaCampoFloral() {
 
 function gerarTexturaCeuEstrelado() {
   const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 512;
+  canvas.width = 1012;
+  canvas.height = 1012;
   const ctx = canvas.getContext('2d');
 
   const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  grad.addColorStop(0, '#000033');
-  grad.addColorStop(1, '#2e003e');
+  grad.addColorStop(0, '#000022');
+  grad.addColorStop(1, '#330033');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  for (let i = 0; i < 500; i++) {
+  for (let i = 0; i < 700; i++) {
     ctx.beginPath();
     ctx.fillStyle = 'white';
     const x = Math.random() * canvas.width;
     const y = Math.random() * canvas.height;
-    const r = Math.random() * 1 + 0.5;
+    const r = Math.random() * 0.7 + 0.3;
     ctx.arc(x, y, r, 0, Math.PI * 2);
     ctx.fill();
   }
@@ -218,10 +215,14 @@ function createMoon(){
 
     const moon = new THREE.Mesh(
         new THREE.SphereGeometry(3),
-        new THREE.MeshStandardMaterial({ color: 0xd3d3d3, metalness: 0.5, roughness: 0.5 })
+        new THREE.MeshStandardMaterial({ color: 0xd3d3d3, metalness: 0.5,
+             roughness: 0.5,emissive: 0xffffdd, emissiveIntensity: 0.6 })
       );
     moon.position.set(-10, 35, 20);
     scene.add(moon);
+    directionalLight = new THREE.DirectionalLight(0xffffff, 1.2); //Luz da lua
+    directionalLight.position.set(-10, 35, 20);
+    scene.add(directionalLight);
 }
 
 function createArvore() {
