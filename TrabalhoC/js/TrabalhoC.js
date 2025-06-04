@@ -41,8 +41,8 @@ function createScene() {
 function createCamera() {
   const aspect = window.innerWidth / window.innerHeight;
   camera = new THREE.PerspectiveCamera(70, aspect, 1, 1000);
-  camera.position.set(45, 30, 45);
-  camera.lookAt(0, 15, 0); 
+  camera.position.set(35, 25, 35);
+  camera.lookAt(0, 10, 0); 
 
   // Câmara fixa com vista geral
   fixedCamera = new THREE.PerspectiveCamera(70, aspect, 1, 1000);
@@ -224,7 +224,7 @@ function createMoon(){
         new THREE.SphereGeometry(3),
         new THREE.MeshStandardMaterial({ color: 0xd3d3d3, metalness: 0.5, roughness: 0.5 })
       );
-    moon.position.set(0, 40, 20);
+    moon.position.set(-10, 35, 20);
     scene.add(moon);
 }
 
