@@ -7,7 +7,7 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 //////////////////////
 /* GLOBAL VARIABLES */
 //////////////////////
-let camera, scene, renderer, plane, textura, directionalLight;
+let camera, scene, renderer, plane, textura, directionalLight, ambientLight;
 let lightOn = true;
 // Adiciona variáveis para câmara fixa e estereoscópica
 let fixedCamera, stereoCamera;
@@ -58,11 +58,11 @@ function createCamera() {
 /* CREATE LIGHT(S) */
 /////////////////////
 function createLight() {
-    //Luz da lua
-    directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    ambientLight = new THREE.AmbientLight(0xffffff,0.5);
+    directionalLight = new THREE.DirectionalLight(0xffffff, 1.2); //Luz da lua
     directionalLight.position.set(0, 40, 20);
     scene.add(directionalLight);
-
+    scene.add(ambientLight);
 }
 
 ////////////////////////
