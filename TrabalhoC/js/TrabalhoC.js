@@ -9,8 +9,7 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 //////////////////////
 let camera, scene, renderer, plane, textura, directionalLight, ambientLight;
 let lightOn = true;
-// Adiciona variáveis para câmara fixa e estereoscópica
-let fixedCamera, stereoCamera;
+let fixedCamera;
 let ovni, spotlight, luzes = [], spotlightOn = true, luzesAtivas = true;
 const keysPressed = {};
 
@@ -49,9 +48,6 @@ function createCamera() {
   fixedCamera.position.set(80, 60, 80);
   fixedCamera.lookAt(0, 0, 0);
 
-  // StereoCamera para VR
-  stereoCamera = new THREE.StereoCamera();
-  stereoCamera.aspect = aspect;
 }
 
 /////////////////////
@@ -527,12 +523,7 @@ function update() {
 /* DISPLAY */
 /////////////
 function render() {
-    // Renderização normal ou VR
-    if (renderer.xr.isPresenting) {
-        renderer.render(scene, camera);
-    } else {
-        renderer.render(scene, camera);
-    }
+    renderer.render(scene, camera);
 }
 
 ////////////////////////////////
@@ -553,6 +544,8 @@ function init() {
   window.addEventListener("keydown", onKeyDown);
   window.addEventListener("keyup", onKeyUp);
   window.addEventListener("resize", onResize);
+
+  renderer.setAnimationLoop(animate);
 }
 
 /////////////////////
@@ -561,7 +554,6 @@ function init() {
 function animate() {
     update();
     render();
-    requestAnimationFrame(animate);
     checkCollisions();
 }
 
@@ -630,4 +622,3 @@ function onKeyUp(e) {
 }
 
 init();
-animate();
