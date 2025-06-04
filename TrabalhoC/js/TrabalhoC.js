@@ -14,6 +14,13 @@ let fixedCamera, stereoCamera;
 let ovni, spotlight, luzes = [], spotlightOn = true, luzesAtivas = true;
 const keysPressed = {};
 
+let meshes ={
+    corpoMesh: null,
+    cilindroMesh: null,
+    cockpitMesh: null,
+    esferaMesh: null,
+}
+
 /////////////////////
 /* CREATE SCENE(S) */
 /////////////////////
@@ -450,19 +457,20 @@ function createOvni(){
     corpoGeometry.scale(1, 0.4, 1);
     const corpoMaterial = new THREE.MeshStandardMaterial({ color: 0x88ffaa});
     const corpoMesh = new THREE.Mesh(corpoGeometry, corpoMaterial);
+    meshes.corpoMesh = corpoMesh;
     ovni.add(corpoMesh);
 
     const cockpitGeometry = new THREE.SphereGeometry(1.5, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2);
     const cockpitMaterial = new THREE.MeshStandardMaterial({ color: 0x44ffff, transparent: true, opacity: 0.6 });
     const cockpitMesh = new THREE.Mesh(cockpitGeometry, cockpitMaterial);
     cockpitMesh.position.y = 1;
+    meshes.cockpitMesh = cockpitMesh;
     ovni.add(cockpitMesh);
 
-    const cilindro = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.8, 0.8, 0.2, 32),
-        new THREE.MeshStandardMaterial({ color: 0x444444 })
-    );
+    const cilindroMesh = new THREE.MeshStandardMaterial({ color: 0x444444 });
+    const cilindro = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 0.2, 32), cilindroMesh);
     cilindro.position.y = -1.2;
+    meshes.cilindroMesh = cilindroMesh;
     ovni.add(cilindro);
 
     spotlight = new THREE.SpotLight(0xffffff, 30, 0, 0.56);
@@ -476,12 +484,13 @@ function createOvni(){
         const x = Math.cos(angle) * 2.5;
         const z = Math.sin(angle) * 2.5;
 
+        const esferaMesh = new THREE.MeshStandardMaterial({ color: 0xffffaa });
         const esfera = new THREE.Mesh(
-        new THREE.SphereGeometry(0.2, 16, 16),
-        new THREE.MeshStandardMaterial({ color: 0xffffaa })
-        );
+        new THREE.SphereGeometry(0.2, 16, 16), esferaMesh);
         esfera.position.set(x, -0.7, z);
+        meshes.esferaMesh = esferaMesh;
         ovni.add(esfera);
+
 
         const luz = new THREE.PointLight(0xffffaa, 1, 5);
         const lx = Math.cos(angle) * (2.8);
@@ -493,6 +502,7 @@ function createOvni(){
     
     ovni.position.y = 20;
     ovni.position.x = 20;
+    meshes.corpoMesh = corpoMesh;
     scene.add(ovni);
 }
 
@@ -582,8 +592,6 @@ function onResize() {
 function onKeyDown(e) { 
     keysPressed[e.key.toLowerCase()] = true;
     switch (e.key){
-
-    
         case '1':
             textura = gerarTexturaCampoFloral();
             createPlaneWithTexture(textura);
@@ -612,6 +620,24 @@ function onKeyDown(e) {
         case 's':
             spotlightOn = !spotlightOn;
             spotlight.visible = spotlightOn;
+            break;
+        case 'q':
+            meshes.cockpitMesh.material = new THREE.MeshLambertMaterial({ color: 0x44ffff, transparent: true, opacity: 0.6 });
+            meshes.cilindroMesh.material = new THREE.MeshLambertMaterial({ color: 0x444444 });
+            meshes.esferaMesh.material = new THREE.MeshLambertMaterial({ color: 0xffffaa });
+            meshes.corpoMesh.material = new THREE.MeshLambertMaterial({ color: 0x88ffaa});
+            break;
+        case 'w':
+            meshes.cockpitMesh.material = new THREE.MeshPhongMaterial({ color: 0x44ffff, transparent: true, opacity: 0.6 });
+            meshes.cilindroMesh.material = new THREE.MeshPhongMaterial({ color: 0x444444 });
+            meshes.esferaMesh.material = new THREE.MeshPhongMaterial({ color: 0xffffaa });
+            meshes.corpoMesh.material = new THREE.MeshPhongMaterial({ color: 0x88ffaa});
+            break;
+        case 'e':
+            meshes.cockpitMesh.material = new THREE.MeshToonMaterial({ color: 0x44ffff, transparent: true, opacity: 0.6 });
+            meshes.cilindroMesh.material = new THREE.MeshToonMaterial({ color: 0x444444 });
+            meshes.esferaMesh.material = new THREE.MeshToonMaterial({ color: 0xffffaa });
+            meshes.corpoMesh.material = new THREE.MeshToonMaterial({ color: 0x88ffaa});
             break;
         case '7':
             // Alterna para a câmara fixa
