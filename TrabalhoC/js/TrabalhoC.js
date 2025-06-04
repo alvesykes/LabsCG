@@ -18,6 +18,7 @@ let meshes ={
     cilindroMesh: null,
     cockpitMesh: null,
     esferaMesh: null,
+    moonMesh: null,
 }
 
 /////////////////////
@@ -220,13 +221,13 @@ function createSkydome() {
 
 function createMoon(){
 
-    const moon = new THREE.Mesh(
-        new THREE.SphereGeometry(3),
-        new THREE.MeshStandardMaterial({ color: 0xd3d3d3, metalness: 0.5,
-             roughness: 0.5,emissive: 0xffffdd, emissiveIntensity: 0.6 })
-      );
-    moon.position.set(-10, 35, 20);
-    scene.add(moon);
+    const moonMaterial = new THREE.MeshStandardMaterial({ color: 0xd3d3d3, metalness: 0.5,
+             roughness: 0.5,emissive: 0xffffdd, emissiveIntensity: 0.6 });
+
+    const moonMesh = new THREE.Mesh(new THREE.SphereGeometry(3),moonMaterial);
+    moonMesh.position.set(-10, 35, 20);
+    meshes.moonMesh = moonMesh;
+    scene.add(moonMesh);
     directionalLight = new THREE.DirectionalLight(0xffffff, 1.2); //Luz da lua
     directionalLight.position.set(-10, 35, 20);
     scene.add(directionalLight);
@@ -464,11 +465,11 @@ function createOvni(){
     meshes.cockpitMesh = cockpitMesh;
     ovni.add(cockpitMesh);
 
-    const cilindroMesh = new THREE.MeshStandardMaterial({ color: 0x444444 });
-    const cilindro = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 0.2, 32), cilindroMesh);
-    cilindro.position.y = -1.2;
+    const cilindroMaterial = new THREE.MeshStandardMaterial({ color: 0x444444 });
+    const cilindroMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 0.2, 32), cilindroMaterial);
+    cilindroMesh.position.y = -1.2;
     meshes.cilindroMesh = cilindroMesh;
-    ovni.add(cilindro);
+    ovni.add(cilindroMesh);
 
     spotlight = new THREE.SpotLight(0xffffff, 30, 0, 0.56);
     spotlight.position.set(0, -1.2, 0);
@@ -481,12 +482,12 @@ function createOvni(){
         const x = Math.cos(angle) * 2.5;
         const z = Math.sin(angle) * 2.5;
 
-        const esferaMesh = new THREE.MeshStandardMaterial({ color: 0xffffaa });
-        const esfera = new THREE.Mesh(
-        new THREE.SphereGeometry(0.2, 16, 16), esferaMesh);
-        esfera.position.set(x, -0.7, z);
+        const esferaMaterial = new THREE.MeshStandardMaterial({ color: 0xffffaa });
+        const esferaMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.2, 16, 16), esferaMaterial);
+        esferaMesh.position.set(x, -0.7, z);
         meshes.esferaMesh = esferaMesh;
-        ovni.add(esfera);
+        ovni.add(esferaMesh);
 
 
         const luz = new THREE.PointLight(0xffffaa, 10, 5);
@@ -499,7 +500,6 @@ function createOvni(){
     
     ovni.position.y = 20;
     ovni.position.x = 20;
-    meshes.corpoMesh = corpoMesh;
     scene.add(ovni);
 }
 
@@ -619,18 +619,21 @@ function onKeyDown(e) {
             meshes.cilindroMesh.material = new THREE.MeshLambertMaterial({ color: 0x444444 });
             meshes.esferaMesh.material = new THREE.MeshLambertMaterial({ color: 0xffffaa });
             meshes.corpoMesh.material = new THREE.MeshLambertMaterial({ color: 0x88ffaa});
+            meshes.moonMesh.material = new THREE.MeshLambertMaterial({ color: 0xd3d3d3, emissive: 0xffffdd, emissiveIntensity: 0.6 });
             break;
         case 'w':
             meshes.cockpitMesh.material = new THREE.MeshPhongMaterial({ color: 0x44ffff, transparent: true, opacity: 0.6 });
             meshes.cilindroMesh.material = new THREE.MeshPhongMaterial({ color: 0x444444 });
             meshes.esferaMesh.material = new THREE.MeshPhongMaterial({ color: 0xffffaa });
             meshes.corpoMesh.material = new THREE.MeshPhongMaterial({ color: 0x88ffaa});
+            meshes.moonMesh.material = new THREE.MeshPhongMaterial({ color: 0xd3d3d3, emissive: 0xffffdd, emissiveIntensity: 0.6 });
             break;
         case 'e':
             meshes.cockpitMesh.material = new THREE.MeshToonMaterial({ color: 0x44ffff, transparent: true, opacity: 0.6 });
             meshes.cilindroMesh.material = new THREE.MeshToonMaterial({ color: 0x444444 });
             meshes.esferaMesh.material = new THREE.MeshToonMaterial({ color: 0xffffaa });
             meshes.corpoMesh.material = new THREE.MeshToonMaterial({ color: 0x88ffaa});
+            meshes.moonMesh.material = new THREE.MeshToonMaterial({ color: 0xd3d3d3, emissive: 0xffffdd, emissiveIntensity: 0.6 });
             break;
         case '7':
             // Alterna para a câmara fixa
