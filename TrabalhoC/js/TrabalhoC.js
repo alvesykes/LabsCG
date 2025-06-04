@@ -17,8 +17,11 @@ let meshes ={
     corpoMesh: null,
     cilindroMesh: null,
     cockpitMesh: null,
-    esferaMesh: null,
+    esferaMesh: [],
     moonMesh: null,
+    copaMesh: null,
+    troncoMesh: null,
+    copaMesh: [],
 }
 
 /////////////////////
@@ -238,22 +241,24 @@ function createArvore() {
 
   const copaMaterial = new THREE.MeshPhongMaterial({ color: 0x013220 });
 
-  const tronco = new THREE.Mesh(
+  const troncoMesh = new THREE.Mesh(
     new THREE.CylinderGeometry(0.5, 0.7, 4, 16),
     new THREE.MeshStandardMaterial({ color: 0xcc7722})
   );
-  tronco.position.y = 2;
-  tronco.rotation.z = THREE.MathUtils.degToRad(10);
-  arvore.add(tronco);
+  troncoMesh.position.y = 2;
+  troncoMesh.rotation.z = THREE.MathUtils.degToRad(10);
+  meshes.troncoMesh = troncoMesh;
+  arvore.add(troncoMesh);
 
-  const ramo = new THREE.Mesh(
+  const ramoMesh = new THREE.Mesh(
     new THREE.CylinderGeometry(0.2, 0.3, 2.5, 12),
     new THREE.MeshStandardMaterial({ color: 0xcc7722})
   );
   
-  ramo.position.set(0.5, 4.5, 0);
-  ramo.rotation.z = THREE.MathUtils.degToRad(-30);
-  arvore.add(ramo);
+  ramoMesh.position.set(0.5, 4.5, 0);
+  ramoMesh.rotation.z = THREE.MathUtils.degToRad(-30);
+  meshes.ramoMesh = ramoMesh;
+  arvore.add(ramoMesh);
 
   const numElipsoides = THREE.MathUtils.randInt(1, 3);
   for (let i = 0; i < numElipsoides; i++) {
@@ -261,17 +266,18 @@ function createArvore() {
     const escalaY = THREE.MathUtils.randFloat(1.0, 2.0);
     const escalaZ = THREE.MathUtils.randFloat(1.5, 2.5);
 
-    const copa = new THREE.Mesh(
+    const copaMesh = new THREE.Mesh(
       new THREE.SphereGeometry(1, 16, 16),
       copaMaterial
     );
-    copa.scale.set(escalaX, escalaY, escalaZ);
-    copa.position.set(
+    copaMesh.scale.set(escalaX, escalaY, escalaZ);
+    copaMesh.position.set(
       THREE.MathUtils.randFloat(-0.5, 0.5),
       THREE.MathUtils.randFloat(5.5, 6.5),
       THREE.MathUtils.randFloat(-0.5, 0.5)
     );
-    arvore.add(copa);
+    meshes.copaMesh.push(copaMesh);
+    arvore.add(copaMesh);
   }
 
   return arvore;
@@ -486,7 +492,7 @@ function createOvni(){
         const esferaMesh = new THREE.Mesh(
         new THREE.SphereGeometry(0.2, 16, 16), esferaMaterial);
         esferaMesh.position.set(x, -0.7, z);
-        meshes.esferaMesh = esferaMesh;
+        meshes.esferaMesh.push(esferaMesh);
         ovni.add(esferaMesh);
 
 
@@ -617,23 +623,33 @@ function onKeyDown(e) {
         case 'q':
             meshes.cockpitMesh.material = new THREE.MeshLambertMaterial({ color: 0x44ffff, transparent: true, opacity: 0.6 });
             meshes.cilindroMesh.material = new THREE.MeshLambertMaterial({ color: 0x444444 });
-            meshes.esferaMesh.material = new THREE.MeshLambertMaterial({ color: 0xffffaa });
+            meshes.esferaMesh.forEach(m => m.material = new THREE.MeshLambertMaterial({ color: 0xffffaa }));
             meshes.corpoMesh.material = new THREE.MeshLambertMaterial({ color: 0x88ffaa});
             meshes.moonMesh.material = new THREE.MeshLambertMaterial({ color: 0xd3d3d3, emissive: 0xffffdd, emissiveIntensity: 0.6 });
+            meshes.copaMesh.forEach(m => m.material = new THREE.MeshLambertMaterial({ color: 0x013220 }));
+            meshes.ramoMesh.material = new THREE.MeshLambertMaterial({ color: 0xcc7722 });
+            meshes.troncoMesh.material = new THREE.MeshLambertMaterial({ color: 0xcc7722 });
+
             break;
         case 'w':
             meshes.cockpitMesh.material = new THREE.MeshPhongMaterial({ color: 0x44ffff, transparent: true, opacity: 0.6 });
             meshes.cilindroMesh.material = new THREE.MeshPhongMaterial({ color: 0x444444 });
-            meshes.esferaMesh.material = new THREE.MeshPhongMaterial({ color: 0xffffaa });
+            meshes.esferaMesh.forEach(m => m.material = new THREE.MeshLambertMaterial({ color: 0xffffaa }));
             meshes.corpoMesh.material = new THREE.MeshPhongMaterial({ color: 0x88ffaa});
             meshes.moonMesh.material = new THREE.MeshPhongMaterial({ color: 0xd3d3d3, emissive: 0xffffdd, emissiveIntensity: 0.6 });
+            meshes.copaMesh.forEach(m => m.material = new THREE.MeshPhongMaterial({ color: 0x013220 }));
+            meshes.ramoMesh.material = new THREE.MeshPhongMaterial({ color: 0xcc7722 });
+            meshes.troncoMesh.material = new THREE.MeshPhongMaterial({ color: 0xcc7722 });
             break;
         case 'e':
             meshes.cockpitMesh.material = new THREE.MeshToonMaterial({ color: 0x44ffff, transparent: true, opacity: 0.6 });
             meshes.cilindroMesh.material = new THREE.MeshToonMaterial({ color: 0x444444 });
-            meshes.esferaMesh.material = new THREE.MeshToonMaterial({ color: 0xffffaa });
+            meshes.esferaMesh.forEach(m => m.material = new THREE.MeshLambertMaterial({ color: 0xffffaa }));
             meshes.corpoMesh.material = new THREE.MeshToonMaterial({ color: 0x88ffaa});
             meshes.moonMesh.material = new THREE.MeshToonMaterial({ color: 0xd3d3d3, emissive: 0xffffdd, emissiveIntensity: 0.6 });
+            meshes.copaMesh.forEach(m => m.material = new THREE.MeshToonMaterial({ color: 0x013220 }));
+            meshes.ramoMesh.material = new THREE.MeshToonMaterial({ color: 0xcc7722 });
+            meshes.troncoMesh.material = new THREE.MeshToonMaterial({ color: 0xcc7722 });
             break;
         case '7':
             // Alterna para a câmara fixa
