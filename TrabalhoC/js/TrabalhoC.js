@@ -483,7 +483,7 @@ function createOvni(){
         esfera.position.set(x, -0.7, z);
         ovni.add(esfera);
 
-        const luz = new THREE.PointLight(0xffffaa, 1, 5);
+        const luz = new THREE.PointLight(0xffffaa, 10, 5);
         const lx = Math.cos(angle) * (2.8);
         const lz = Math.sin(angle) * (2.8);
         luz.position.set(lx, -0.8, lz);
