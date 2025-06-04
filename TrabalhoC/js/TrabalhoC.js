@@ -175,6 +175,30 @@ function createPlaneWithHeightmap(url, textura) {
         geometry.computeVertexNormals();
 
         scene.add(plane);
+        const numTrees = 75;
+        for (let i = 0; i < numTrees; i++) {
+            const arvore = createArvore();
+            const posX = THREE.MathUtils.randFloatSpread(90); 
+            const posZ = THREE.MathUtils.randFloatSpread(90);
+            const u = (posX + 50) / 100;
+            const v = (posZ + 50) / 100;
+
+            const xPixel = Math.floor(u * image.width);
+            const yPixel = Math.floor(v * image.height);
+            const index = (yPixel * image.width + xPixel) * 4;
+            const heightValue = imgData[index];
+            const alturaNormalizada = (heightValue / 255) * 10;
+
+            arvore.position.set(posX, alturaNormalizada, posZ);
+            arvore.rotation.y = Math.random() * Math.PI * 2;
+
+            const scale = THREE.MathUtils.randFloat(0.8, 1.4);
+            arvore.scale.set(scale, scale, scale);
+
+            if ((posX > 20 || posX < 0) && (posZ > 20 || posZ < 0)){ //Garantir que as árvores são geradas afastadas da casa alentejana
+              scene.add(arvore);
+            }  
+        }
     }, undefined, (err) => {
         console.error("Erro ao carregar heightmap:", err);
     });
@@ -203,6 +227,51 @@ function createMoon(){
     moon.position.set(0, 40, 20);
     scene.add(moon);
 }
+
+function createArvore() {
+  const arvore = new THREE.Group();
+
+  const copaMaterial = new THREE.MeshPhongMaterial({ color: 0x013220 });
+
+  const tronco = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.5, 0.7, 4, 16),
+    new THREE.MeshStandardMaterial({ color: 0xcc7722})
+  );
+  tronco.position.y = 2;
+  tronco.rotation.z = THREE.MathUtils.degToRad(10);
+  arvore.add(tronco);
+
+  const ramo = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.2, 0.3, 2.5, 12),
+    new THREE.MeshStandardMaterial({ color: 0xcc7722})
+  );
+  
+  ramo.position.set(0.5, 4.5, 0);
+  ramo.rotation.z = THREE.MathUtils.degToRad(-30);
+  arvore.add(ramo);
+
+  const numElipsoides = THREE.MathUtils.randInt(1, 3);
+  for (let i = 0; i < numElipsoides; i++) {
+    const escalaX = THREE.MathUtils.randFloat(1.5, 2.5);
+    const escalaY = THREE.MathUtils.randFloat(1.0, 2.0);
+    const escalaZ = THREE.MathUtils.randFloat(1.5, 2.5);
+
+    const copa = new THREE.Mesh(
+      new THREE.SphereGeometry(1, 16, 16),
+      copaMaterial
+    );
+    copa.scale.set(escalaX, escalaY, escalaZ);
+    copa.position.set(
+      THREE.MathUtils.randFloat(-0.5, 0.5),
+      THREE.MathUtils.randFloat(5.5, 6.5),
+      THREE.MathUtils.randFloat(-0.5, 0.5)
+    );
+    arvore.add(copa);
+  }
+
+  return arvore;
+}
+
 
 function createAlentejoHouse() {
     const house = new THREE.Group();
