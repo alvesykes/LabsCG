@@ -22,6 +22,14 @@ let meshes ={
     copaMesh: null,
     troncoMesh: null,
     copaMesh: [],
+    wallMesh: null,
+    faixaMesh: null,
+    doorMesh: null,
+    window1Mesh: null,
+    roofMesh: null,
+    chimneyMesh: null,
+    pilarRectangleMesh: null,
+    pilarRampaMesh: null,
 }
 
 /////////////////////
@@ -290,57 +298,61 @@ function createAlentejoHouse() {
 
     // Paredes principais (brancas)
     const wallMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
-    const walls = new THREE.Mesh(
+    const wallMesh = new THREE.Mesh(
         new THREE.BoxGeometry(18, 4.5, 8),
         wallMaterial
     );
-    walls.position.y = 3;
-    house.add(walls);
+    wallMesh.position.y = 3;
+    meshes.wallMesh = wallMesh;
+    house.add(wallMesh);
 
     // Faixa azul em rodapé (base da casa)
     const faixaMaterial = new THREE.MeshLambertMaterial({ color: 0x0074d9 });
-    const faixa = new THREE.Mesh(
+    const faixaMesh = new THREE.Mesh(
         new THREE.BoxGeometry(18.05, 0.5, 8.05),
         faixaMaterial
     );
-    faixa.position.y = 1; // junto ao chão
-    house.add(faixa);
+    faixaMesh.position.y = 1; // junto ao chão
+    meshes.faixaMesh = faixaMesh;
+    house.add(faixaMesh);
 
     // Porta (azul)
     const doorMaterial = new THREE.MeshLambertMaterial({ color: 0x0074d9 });
-    const door = new THREE.Mesh(
+    const doorMesh = new THREE.Mesh(
         new THREE.BoxGeometry(1.5, 3.5, 0.2),
         doorMaterial
     );
-    door.position.set(-1.75, 2.5, 4);
-    house.add(door);
+    doorMesh.position.set(-1.75, 2.5, 4);
+    meshes.doorMesh = doorMesh;
+    house.add(doorMesh);
 
     // Janelas (azul) - duas à frente
     const windowMaterial = new THREE.MeshLambertMaterial({ color: 0x0074d9 });
-    const window1 = new THREE.Mesh(
+    const window1Mesh = new THREE.Mesh(
         new THREE.BoxGeometry(2, 2, 0.2),
         windowMaterial
     );
+ 
+    meshes.window1Mesh = window1Mesh;
+    window1Mesh.position.set(-6.5, 3.25, 4);
+    house.add(window1Mesh);
 
-    window1.position.set(-6.5, 3.25, 4);
-    house.add(window1);
+    const window2Mesh = window1Mesh.clone();
+    window2Mesh.position.set(-4, 3.25, 4);
+    house.add(window2Mesh);
 
-    const window2 = window1.clone();
-    window2.position.set(-4, 3.25, 4);
-    house.add(window2);
+    const window3Mesh = window1Mesh.clone();
+    window3Mesh.position.set(2, 3.25, 4);
+    house.add(window3Mesh);
 
-    const window3 = window1.clone();
-    window3.position.set(2, 3.25, 4);
-    house.add(window3);
+    const window4Mesh = window1Mesh.clone();
+    window4Mesh.position.set(6.5, 3.25, 4);
+    house.add(window4Mesh);
 
-    const window4 = window1.clone();
-    window4.position.set(6.5, 3.25, 4);
-    house.add(window4);
-
-    const window5 = window1.clone();
-    window5.position.set(9, 3.25, 0); 
-    window5.rotation.y = -Math.PI / 2; 
-    house.add(window5);
+    const window5Mesh = window1Mesh.clone();
+    window5Mesh.position.set(9, 3.25, 0); 
+    window5Mesh.rotation.y = -Math.PI / 2; 
+    house.add(window5Mesh);
 
     // Telhado com altura de 2 e junto às paredes
     const roofGeometry = new THREE.BufferGeometry();
@@ -376,41 +388,46 @@ function createAlentejoHouse() {
     roofGeometry.computeVertexNormals();
 
     const roofMaterial = new THREE.MeshLambertMaterial({ color: 0xff6600, side: THREE.DoubleSide });
-    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
-    roof.position.y = -1.75; 
-    house.add(roof);
+    const roofMesh = new THREE.Mesh(roofGeometry, roofMaterial);
+    roofMesh.position.y = -1.75; 
+    meshes.roofMesh = roofMesh;
+    house.add(roofMesh);
 
 
-    const chimney = new THREE.Mesh(
+    const chimneyMesh = new THREE.Mesh(
         new THREE.BoxGeometry(2.5, 2.5, 1),
         new THREE.MeshLambertMaterial({ color: 0xffffff })
     );
 
-    const chimneyLeft = chimney.clone();
-    chimneyLeft.position.set(-4.25, 6.5, -3.5);
-    house.add(chimneyLeft);
+    meshes.chimneyMesh = chimneyMesh;
 
-    const chimneyRight = chimney.clone();
-    chimneyRight.position.set(4.25, 6.5, 3.5);
-    house.add(chimneyRight);
+    const chimneyLeftMesh = chimneyMesh.clone();
+    chimneyLeftMesh.position.set(-4.25, 6.5, -3.5);
+    house.add(chimneyLeftMesh);
+
+    const chimneyRightMesh = chimneyMesh.clone();
+    chimneyRightMesh.position.set(4.25, 6.5, 3.5);
+    house.add(chimneyRightMesh);
 
     const pilares = new THREE.Group();
-    const pilarRectangle = new THREE.Mesh(
+    const pilarRectangleMesh = new THREE.Mesh(
         new THREE.BoxGeometry(1, 4, 0.5),
         new THREE.MeshLambertMaterial({ color: 0xffffff }) 
     );
 
-    const pilarRectangle1 = pilarRectangle.clone();
+    meshes.pilarRectangleMesh = pilarRectangleMesh;
+
+    const pilarRectangle1 = pilarRectangleMesh.clone();
     pilarRectangle1.position.set(8.5, 2.75, 4.25);
-    const pilarRectangle2 = pilarRectangle.clone();
+    const pilarRectangle2 = pilarRectangleMesh.clone();
     pilarRectangle2.position.set(-8.5, 2.75, 4.25);
-    const pilarRectangle3 = pilarRectangle.clone();
+    const pilarRectangle3 = pilarRectangleMesh.clone();
     pilarRectangle3.position.set(0, 2.75, 4.25);
-    const pilarRectangle4 = pilarRectangle.clone();
+    const pilarRectangle4 = pilarRectangleMesh.clone();
     pilarRectangle4.position.set(0, 2.75, -4.25);
-    const pilarRectangle5 = pilarRectangle.clone();
+    const pilarRectangle5 = pilarRectangleMesh.clone();
     pilarRectangle5.position.set(8.5, 2.75, -4.25);
-    const pilarRectangle6 = pilarRectangle.clone();
+    const pilarRectangle6 = pilarRectangleMesh.clone();
     pilarRectangle6.position.set(-8.5, 2.75, -4.25);
 
     pilares.add(pilarRectangle1);
@@ -420,27 +437,29 @@ function createAlentejoHouse() {
     pilares.add(pilarRectangle5);
     pilares.add(pilarRectangle6);
 
-    const pilarRamp = new THREE.Mesh(
+    const pilarRampaMesh = new THREE.Mesh(
         new THREE.BoxGeometry(1, 5, 5),
         new THREE.MeshLambertMaterial({ color: 0xffffff })
     );
 
-    const pilarRamp1 = pilarRamp.clone();
+    meshes.pilarRampaMesh = pilarRampaMesh;
+
+    const pilarRamp1 = pilarRampaMesh.clone();
     pilarRamp1.position.set(8.5, 1.5, 3);
     pilarRamp1.rotation.x = - Math.PI / 10; 
-    const pilarRamp2 = pilarRamp.clone();
+    const pilarRamp2 = pilarRampaMesh.clone();
     pilarRamp2.position.set(-8.5, 1.5, 3);
     pilarRamp2.rotation.x = - Math.PI / 10;
-    const pilarRamp3 = pilarRamp.clone();
+    const pilarRamp3 = pilarRampaMesh.clone();
     pilarRamp3.position.set(0, 1.5, 3);
     pilarRamp3.rotation.x = - Math.PI / 10;
-    const pilarRamp4 = pilarRamp.clone();
+    const pilarRamp4 = pilarRampaMesh.clone();
     pilarRamp4.position.set(0, 1.5, -3);
     pilarRamp4.rotation.x = Math.PI / 10;
-    const pilarRamp5 = pilarRamp.clone();
+    const pilarRamp5 = pilarRampaMesh.clone();
     pilarRamp5.position.set(8.5, 1.5, -3);
     pilarRamp5.rotation.x = Math.PI / 10;
-    const pilarRamp6 = pilarRamp.clone();
+    const pilarRamp6 = pilarRampaMesh.clone();
     pilarRamp6.position.set(-8.5, 1.5, -3);
     pilarRamp6.rotation.x = Math.PI / 10;
     pilares.add(pilarRamp1);
@@ -629,6 +648,15 @@ function onKeyDown(e) {
             meshes.copaMesh.forEach(m => m.material = new THREE.MeshLambertMaterial({ color: 0x013220 }));
             meshes.ramoMesh.material = new THREE.MeshLambertMaterial({ color: 0xcc7722 });
             meshes.troncoMesh.material = new THREE.MeshLambertMaterial({ color: 0xcc7722 });
+            meshes.troncoMesh.material = new THREE.MeshLambertMaterial({ color: 0xcc7722 });
+            meshes.wallMesh.material = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            meshes.faixaMesh.material = new THREE.MeshLambertMaterial({color: 0x0074d9 });
+            meshes.doorMesh.material = new THREE.MeshLambertMaterial({ color: 0x0074d9  });
+            meshes.window1Mesh.material = new THREE.MeshLambertMaterial({ color: 0x0074d9 });
+            meshes.roofMesh.material = new THREE.MeshLambertMaterial({ color: 0xff6600, side: THREE.DoubleSide });
+            meshes.chimneyMesh.material = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            meshes.pilarRectangleMesh.material = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            meshes.pilarRampMesh.material = new THREE.MeshLambertMaterial({ color: 0xffffff });
 
             break;
         case 'w':
@@ -640,6 +668,14 @@ function onKeyDown(e) {
             meshes.copaMesh.forEach(m => m.material = new THREE.MeshPhongMaterial({ color: 0x013220 }));
             meshes.ramoMesh.material = new THREE.MeshPhongMaterial({ color: 0xcc7722 });
             meshes.troncoMesh.material = new THREE.MeshPhongMaterial({ color: 0xcc7722 });
+            meshes.wallMesh.material = new THREE.MeshPhongMaterial({ color: 0xffffff });
+            meshes.faixaMesh.material = new THREE.MeshPhongMaterial({color: 0x0074d9 });
+            meshes.doorMesh.material = new THREE.MeshPhongMaterial({ color: 0x0074d9  });
+            meshes.window1Mesh.material = new THREE.MeshPhongMaterial({ color: 0x0074d9 });
+            meshes.roofMesh.material = new THREE.MeshPhongMaterial({ color: 0xff6600, side: THREE.DoubleSide });
+            meshes.chimneyMesh.material = new THREE.MeshPhongMaterial({ color: 0xffffff });
+            meshes.pilarRectangleMesh.material = new THREE.MeshPhongMaterial({ color: 0xffffff });
+            meshes.pilarRampMesh.material = new THREE.MeshPhongMaterial({ color: 0xffffff });
             break;
         case 'e':
             meshes.cockpitMesh.material = new THREE.MeshToonMaterial({ color: 0x44ffff, transparent: true, opacity: 0.6 });
@@ -650,6 +686,14 @@ function onKeyDown(e) {
             meshes.copaMesh.forEach(m => m.material = new THREE.MeshToonMaterial({ color: 0x013220 }));
             meshes.ramoMesh.material = new THREE.MeshToonMaterial({ color: 0xcc7722 });
             meshes.troncoMesh.material = new THREE.MeshToonMaterial({ color: 0xcc7722 });
+            meshes.wallMesh.material = new THREE.MeshToonMaterial({ color: 0xffffff });
+            meshes.faixaMesh.material = new THREE.MeshToonMaterial({color: 0x0074d9 });
+            meshes.doorMesh.material = new THREE.MeshToonMaterial({ color: 0x0074d9  });
+            meshes.window1Mesh.material = new THREE.MeshToonMaterial({ color: 0x0074d9 });
+            meshes.roofMesh.material = new THREE.MeshToonMaterial({ color: 0xff6600, side: THREE.DoubleSide });
+            meshes.chimneyMesh.material = new THREE.MeshToonMaterial({ color: 0xffffff });
+            meshes.pilarRectangleMesh.material = new THREE.MeshToonMaterial({ color: 0xffffff });
+            meshes.pilarRampMesh.material = new THREE.MeshToonMaterial({ color: 0xffffff });
             break;
         case '7':
             // Alterna para a câmara fixa
