@@ -701,46 +701,46 @@ function onKeyDown(e) {
             shadingModeKey = 'e';
             break;
         case 'r':
-        lightingEnabled = !lightingEnabled;
-    
-        const basicMaterialCilindro = new THREE.MeshBasicMaterial({ color: 0x444444 });
-        const basicMaterialEsfera = new THREE.MeshBasicMaterial({ color: 0xffffaa });
-        const basicMaterialCorpo = new THREE.MeshBasicMaterial({ color: 0x88ffaa });
-        const basicMaterialMoon = new THREE.MeshBasicMaterial({ color: 0xd3d3d3 });
-        const basicMaterialCopa = new THREE.MeshBasicMaterial({ color: 0x013220 });
-        const basicMaterialRamo = new THREE.MeshBasicMaterial({ color: 0xcc7722 });
-        const basicMaterialFaixa = new THREE.MeshBasicMaterial({ color: 0x0074d9 });
-        const basicMaterialTronco = new THREE.MeshBasicMaterial({ color: 0xcc7722 });
-        const basicMaterialWall = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        const basicMaterialCockpit = new THREE.MeshBasicMaterial({ color: 0x44ffff });
-        const basicMaterialDoor = new THREE.MeshBasicMaterial({ color: 0x0074d9 });
-        const basicMaterialWindow1 = new THREE.MeshBasicMaterial({ color: 0x0074d9 });
-        const basicMaterialRoof = new THREE.MeshBasicMaterial({ color: 0xff6600, side: THREE.DoubleSide });
-        const basicMaterialChimney = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        const basicMaterialPilarRectangle = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        const basicMaterialPilarRamp = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            lightingEnabled = !lightingEnabled;
+        
+            const basicMaterialCilindro = new THREE.MeshBasicMaterial({ color: 0x444444 });
+            const basicMaterialEsfera = new THREE.MeshBasicMaterial({ color: 0xffffaa });
+            const basicMaterialCorpo = new THREE.MeshBasicMaterial({ color: 0x88ffaa });
+            const basicMaterialMoon = new THREE.MeshBasicMaterial({ color: 0xd3d3d3 });
+            const basicMaterialCopa = new THREE.MeshBasicMaterial({ color: 0x013220 });
+            const basicMaterialRamo = new THREE.MeshBasicMaterial({ color: 0xcc7722 });
+            const basicMaterialFaixa = new THREE.MeshBasicMaterial({ color: 0x0074d9 });
+            const basicMaterialTronco = new THREE.MeshBasicMaterial({ color: 0xcc7722 });
+            const basicMaterialWall = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const basicMaterialCockpit = new THREE.MeshBasicMaterial({ color: 0x44ffff });
+            const basicMaterialDoor = new THREE.MeshBasicMaterial({ color: 0x0074d9 });
+            const basicMaterialWindow1 = new THREE.MeshBasicMaterial({ color: 0x0074d9 });
+            const basicMaterialRoof = new THREE.MeshBasicMaterial({ color: 0xff6600, side: THREE.DoubleSide });
+            const basicMaterialChimney = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const basicMaterialPilarRectangle = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const basicMaterialPilarRamp = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
-        if (!lightingEnabled) {
-            meshes.cockpitMesh.material = basicMaterialCockpit;
-            meshes.cilindroMesh.material = basicMaterialCilindro;
-            meshes.corpoMesh.material = basicMaterialCorpo;
-            meshes.esferaMesh.forEach(m => m.material = basicMaterialEsfera);
-            meshes.moonMesh.material = basicMaterialMoon;
-            meshes.copaMesh.forEach(m => m.material = basicMaterialCopa);
-            meshes.ramoMesh.material = basicMaterialRamo;
-            meshes.troncoMesh.material = basicMaterialTronco;
-            meshes.wallMesh.material = basicMaterialWall;
-            meshes.faixaMesh.material = basicMaterialFaixa;
-            meshes.doorMesh.material = basicMaterialDoor;
-            meshes.window1Mesh.material = basicMaterialWindow1;
-            meshes.roofMesh.material = basicMaterialRoof;
-            meshes.chimneyMesh.material = basicMaterialChimney;
-            meshes.pilarRectangleMesh.material = basicMaterialPilarRectangle;
-            meshes.pilarRampMesh.material = basicMaterialPilarRamp;
-        } else {
-            onKeyDown({ key: shadingModeKey }); // Key de tipo de sombreamento anterior
-        }
-        break;
+            if (!lightingEnabled) {
+                meshes.cockpitMesh.material = basicMaterialCockpit;
+                meshes.cilindroMesh.material = basicMaterialCilindro;
+                meshes.corpoMesh.material = basicMaterialCorpo;
+                meshes.esferaMesh.forEach(m => m.material = basicMaterialEsfera);
+                meshes.moonMesh.material = basicMaterialMoon;
+                meshes.copaMesh.forEach(m => m.material = basicMaterialCopa);
+                meshes.ramoMesh.material = basicMaterialRamo;
+                meshes.troncoMesh.material = basicMaterialTronco;
+                meshes.wallMesh.material = basicMaterialWall;
+                meshes.faixaMesh.material = basicMaterialFaixa;
+                meshes.doorMesh.material = basicMaterialDoor;
+                meshes.window1Mesh.material = basicMaterialWindow1;
+                meshes.roofMesh.material = basicMaterialRoof;
+                meshes.chimneyMesh.material = basicMaterialChimney;
+                meshes.pilarRectangleMesh.material = basicMaterialPilarRectangle;
+                meshes.pilarRampMesh.material = basicMaterialPilarRamp;
+            } else {
+                onKeyDown({ key: shadingModeKey }); // Key de tipo de sombreamento anterior
+            }
+            break;
         case '7':
             // Alterna para a câmara fixa
             camera = fixedCamera;
