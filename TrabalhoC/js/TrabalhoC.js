@@ -315,7 +315,7 @@ function createAlentejoHouse() {
         new THREE.BoxGeometry(18.05, 0.5, 8.05),
         faixaMaterial
     );
-    faixaMesh.position.y = 1; // junto ao chão
+    faixaMesh.position.y = 1; 
     meshes.faixaMesh = faixaMesh;
     house.add(faixaMesh);
 
@@ -361,14 +361,14 @@ function createAlentejoHouse() {
     const roofGeometry = new THREE.BufferGeometry();
     const vertices = new Float32Array([
         // Base do telhado (em cima das paredes)
-        -9, 7, -4,   // 0: canto esquerdo-trás
-         9, 7, -4,   // 1: canto direito-trás
-         9, 7,  4,   // 2: canto direito-frente
-        -9, 7,  4,   // 3: canto esquerdo-frente
+        -9, 7, -4,   
+         9, 7, -4,   
+         9, 7,  4,   
+        -9, 7,  4,   
         // Topo esquerdo (meio da lateral esquerda)
-        -9, 9, 0,    // 4: topo lateral esquerda (altura 7+2=9)
+        -9, 9, 0,    
         // Topo direito (meio da lateral direita)
-         9, 9, 0     // 5: topo lateral direita (altura 7+2=9)
+         9, 9, 0
     ]);
     // Faces: duas laterais triangulares, frente e trás retangulares
     const indices = [
@@ -382,7 +382,7 @@ function createAlentejoHouse() {
         // Trás (retângulo)
         0, 1, 5,
         0, 5, 4,
-        // Fundo do telhado (base inferior, para garantir que as laterais fiquem visíveis)
+        // Fundo do telhado (base inferior)
         0, 1, 2,
         0, 2, 3
     ];
